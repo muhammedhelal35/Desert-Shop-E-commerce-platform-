@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title || 'Sweet Delights - Premium Desserts' %></title>
+  
+  <!-- Enhanced Meta Tags -->
+  <meta name="description" content="Indulge in our handcrafted premium desserts made with the finest ingredients. From classic cakes to innovative pastries, we have something to satisfy every sweet tooth.">
+  <meta name="keywords" content="desserts, cakes, pastries, sweets, bakery, premium desserts, handcrafted">
+  <meta name="author" content="Sweet Delights">
+  <meta name="theme-color" content="#ff6b9d">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  
+  <!-- Open Graph Meta Tags -->
+  <meta property="og:title" content="<%= title || 'Sweet Delights - Premium Desserts' %>">
+  <meta property="og:description" content="Indulge in our handcrafted premium desserts made with the finest ingredients.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="<%= typeof url !== 'undefined' ? url : 'https://sweetdelights.com' %>">
+  <meta property="og:image" content="/images/logo.png">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+  <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="/css/style.css">
+  
+  <!-- Enhanced Loading Styles -->
+  <style>
+    body { 
+      opacity: 0; 
+      transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1); 
+      background: linear-gradient(135deg, #fff5f8 0%, #f0f9ff 50%, #f0fdf4 100%);
+    }
+    body.visible { opacity: 1; }
+    
+    main { 
+      max-width: 1400px; 
+      margin: 0 auto; 
+      padding: 2rem 1.5rem 3rem 1.5rem; 
+      min-height: calc(100vh - 200px);
+    }
+    
+    @media (max-width: 768px) { 
+      main { 
+        padding: 1rem 1rem 2rem 1rem; 
+      } 
+    }
+    
+    @media (max-width: 480px) { 
+      main { 
+        padding: 0.5rem 0.5rem 1.5rem 0.5rem; 
+      } 
+    }
+    
+    /* Loading animation */
+    .loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #fff5f8 0%, #f0f9ff 50%, #f0fdf4 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      transition: opacity 0.5s ease-out;
+    }
+    
+    .loading.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 3px solid rgba(255, 107, 157, 0.2);
+      border-top: 3px solid #ff6b9d;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Global Settings Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(8px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      opacity: 0;
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .modal-overlay.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .modal-container {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(255, 107, 157, 0.12);
+      max-width: 600px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+      transform: scale(0.9) translateY(20px);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1px solid #ecf0f1;
+    }
+
+    .modal-overlay.active .modal-container {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid #ecf0f1;
+      background: #fefefe;
+      border-radius: 20px 20px 0 0;
+    }
+
+    .modal-header h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #2c3e50;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      color: #7f8c8d;
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 12px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .modal-close:hover {
+      background: #fff5f8;
+      color: #e91e63;
+      transform: scale(1.1);
+    }
+
+    .modal-content {
+      padding: 2rem;
+    }
+
+    .settings-section {
+      margin-bottom: 2rem;
+    }
+
+    .settings-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.8rem;
+      border-bottom: 2px solid #f8f9fa;
+    }
+
+    .section-header i {
+      font-size: 1.2rem;
+      color: #4361EE;
+      width: 24px;
+      text-align: center;
+    }
+
+    .section-header h3 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #2c3e50;
+      margin: 0;
+    }
+
+    /* Avatar Upload Styles */
+    .avatar-upload {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .avatar-preview {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(255, 107, 157, 0.08);
+      cursor: pointer;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .avatar-preview:hover {
+      transform: scale(1.05);
+    }
+
+    .avatar-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .avatar-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .avatar-preview:hover .avatar-overlay {
+      opacity: 1;
+    }
+
+    .avatar-overlay i {
+      color: white;
+      font-size: 1.5rem;
+    }
+
+    /* Form Grid */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
+
+    .form-group label {
+      font-weight: 600;
+      color: #495057;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 1rem 1.2rem;
+      border-radius: 20px;
+      border: 1.5px solid #ecf0f1;
+      background: #fff;
+      font-size: 1rem;
+      transition: border 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .form-control:focus {
+      outline: none;
+      border: 2px solid #4361EE;
+      box-shadow: 0 2px 8px rgba(67, 97, 238, 0.1);
+    }
+
+    /* Privacy Toggle Styles */
+    .privacy-options {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .toggle-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      background: #fefefe;
+      border-radius: 12px;
+      border: 1px solid #ecf0f1;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .toggle-item:hover {
+      background: #fff5f8;
+      border-color: #ffb3d1;
+      transform: translateX(5px);
+    }
+
+    .toggle-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex: 1;
+    }
+
+    .toggle-info i {
+      font-size: 1.1rem;
+      color: #4361EE;
+      width: 20px;
+      text-align: center;
+    }
+
+    .toggle-info h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #2c3e50;
+      margin: 0 0 0.2rem 0;
+    }
+
+    .toggle-info p {
+      font-size: 0.9rem;
+      color: #7f8c8d;
+      margin: 0;
+    }
+
+    /* Toggle Switch */
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+      cursor: pointer;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 24px;
+    }
+
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .toggle-switch input:checked + .toggle-slider {
+      background-color: #4361EE;
+    }
+
+    .toggle-switch input:checked + .toggle-slider:before {
+      transform: translateX(26px);
+    }
+
+    /* Preferences Styles */
+    .preferences-options {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .preference-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .preference-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex: 1;
+    }
+
+    .preference-info i {
+      font-size: 1.1rem;
+      color: #4361EE;
+      width: 20px;
+      text-align: center;
+    }
+
+    .preference-info h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #2c3e50;
+      margin: 0 0 0.2rem 0;
+    }
+
+    .preference-info p {
+      font-size: 0.9rem;
+      color: #7f8c8d;
+      margin: 0;
+    }
+
+    .preference-item select {
+      min-width: 150px;
+    }
+
+    /* Modal Footer */
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      padding: 1.5rem 2rem;
+      border-top: 1px solid #ecf0f1;
+      background: #fefefe;
+      border-radius: 0 0 20px 20px;
+    }
+
+    .modal-footer button {
+      padding: 0.8rem 1.5rem;
+      border-radius: 12px;
+      font-weight: 600;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-main {
+      background: linear-gradient(135deg, #4361EE, #3a0ca3);
+      color: white;
+    }
+
+    .btn-secondary {
+      background: #ecf0f1;
+      color: #2c3e50;
+    }
+
+    .btn-sm {
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+    }
+
+    .modal-footer .btn-main:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(255, 107, 157, 0.08);
+    }
+
+    .modal-footer .btn-secondary:hover {
+      background: #d5dbdb;
+      transform: translateY(-2px);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .modal-container {
+        width: 95%;
+        max-height: 95vh;
+      }
+
+      .modal-content {
+        padding: 1.5rem;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      .preference-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.8rem;
+      }
+
+      .preference-item select {
+        width: 100%;
+        min-width: auto;
+      }
+
+      .modal-footer {
+        flex-direction: column;
+        gap: 0.8rem;
+      }
+
+      .modal-footer button {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .modal-header {
+        padding: 1rem 1.5rem;
+      }
+
+      .modal-content {
+        padding: 1rem;
+      }
+
+      .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+      }
+
+      .toggle-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+
+      .toggle-info {
+        width: 100%;
+      }
+    }
+
+    @keyframes ripple {
+      to {
+        transform: translate(-50%, -50%) scale(2);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body class="fade-in-bg">
+  <!-- Loading Screen -->
+  <div class="loading" id="loading">
+    <div class="loading-spinner"></div>
+  </div>
+
+  <!-- Navigation -->
+  <%- include('../partials/_navbar') %>
+  
+  <!-- Flash Messages -->
+  <%- include('../partials/_flash') %>
+  
+  <!-- Main Content -->
+  <main>
+    <%- body %>
+  </main>
+  
+  <!-- Footer -->
+  <%- include('../partials/_footer') %>
+  
+  <!-- Global Settings Modal -->
+  <% if (user) { %>
+  <div id="settingsModal" class="modal-overlay">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h2><i class="fas fa-user-cog"></i> Profile Settings</h2>
+        <button class="modal-close" onclick="closeSettingsModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="modal-content">
+        <!-- Profile Picture Section -->
+        <div class="settings-section">
+          <div class="section-header">
+            <i class="fas fa-camera"></i>
+            <h3>Profile Picture</h3>
+          </div>
+          <div class="avatar-upload">
+            <div class="avatar-preview">
+              <img id="avatarPreview" src="<%= user.avatar || '/images/default-avatar.svg' %>" alt="Profile Picture">
+              <div class="avatar-overlay">
+                <i class="fas fa-camera"></i>
+              </div>
+            </div>
+            <input type="file" id="avatarInput" accept="image/*" style="display: none;">
+            <button class="btn-secondary btn-sm" onclick="document.getElementById('avatarInput').click()">
+              <i class="fas fa-upload"></i> Upload Photo
+            </button>
+            <button class="btn-secondary btn-sm" onclick="removeAvatar()">
+              <i class="fas fa-trash"></i> Remove
+            </button>
+          </div>
+        </div>
+
+        <!-- Basic Info Section -->
+        <div class="settings-section">
+          <div class="section-header">
+            <i class="fas fa-user"></i>
+            <h3>Basic Information</h3>
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="modalName">Full Name</label>
+              <input type="text" id="modalName" value="<%= user.name %>" class="form-control">
+            </div>
+            <div class="form-group">
+              <label for="modalEmail">Email Address</label>
+              <input type="email" id="modalEmail" value="<%= user.email %>" class="form-control">
+            </div>
+            <div class="form-group">
+              <label for="modalPhone">Phone Number</label>
+              <input type="tel" id="modalPhone" value="<%= user.phone || '' %>" class="form-control">
+            </div>
+            <div class="form-group">
+              <label for="modalAddress">Address</label>
+              <textarea id="modalAddress" class="form-control" rows="3"><%= user.address || '' %></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Privacy Settings Section -->
+        <div class="settings-section">
+          <div class="section-header">
+            <i class="fas fa-shield-alt"></i>
+            <h3>Privacy Settings</h3>
+          </div>
+          <div class="privacy-options">
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <i class="fas fa-envelope"></i>
+                <div>
+                  <h4>Show Email to Others</h4>
+                  <p>Allow other users to see your email address</p>
+                </div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="showEmail" <%= user.showEmail ? 'checked' : '' %>>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <i class="fas fa-phone"></i>
+                <div>
+                  <h4>Show Phone Number</h4>
+                  <p>Display your phone number on your profile</p>
+                </div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="showPhone" <%= user.showPhone ? 'checked' : '' %>>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <i class="fas fa-map-marker-alt"></i>
+                <div>
+                  <h4>Show Address</h4>
+                  <p>Make your address visible to other users</p>
+                </div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="showAddress" <%= user.showAddress ? 'checked' : '' %>>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <i class="fas fa-bell"></i>
+                <div>
+                  <h4>Email Notifications</h4>
+                  <p>Receive email updates about orders and promotions</p>
+                </div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="emailNotifications" <%= user.emailNotifications ? 'checked' : '' %>>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Account Preferences Section -->
+        <div class="settings-section">
+          <div class="section-header">
+            <i class="fas fa-cog"></i>
+            <h3>Account Preferences</h3>
+          </div>
+          <div class="preferences-options">
+            <div class="preference-item">
+              <div class="preference-info">
+                <i class="fas fa-palette"></i>
+                <div>
+                  <h4>Theme</h4>
+                  <p>Choose your preferred color theme</p>
+                </div>
+              </div>
+              <select id="themeSelect" class="form-control">
+                <option value="light" <%= user.theme === 'light' ? 'selected' : '' %>>Light Mode</option>
+                <option value="dark" <%= user.theme === 'dark' ? 'selected' : '' %>>Dark Mode</option>
+                <option value="auto" <%= user.theme === 'auto' ? 'selected' : '' %>>Auto (System)</option>
+              </select>
+            </div>
+            
+            <div class="preference-item">
+              <div class="preference-info">
+                <i class="fas fa-language"></i>
+                <div>
+                  <h4>Language</h4>
+                  <p>Select your preferred language</p>
+                </div>
+              </div>
+              <select id="languageSelect" class="form-control">
+                <option value="en" <%= user.language === 'en' ? 'selected' : '' %>>English</option>
+                <option value="es" <%= user.language === 'es' ? 'selected' : '' %>>Español</option>
+                <option value="fr" <%= user.language === 'fr' ? 'selected' : '' %>>Français</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="modalPreferences">Dietary Preferences</label>
+              <textarea id="modalPreferences" class="form-control" rows="3" placeholder="Any special preferences or dietary restrictions..."><%= user.preferences || '' %></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeSettingsModal()">Cancel</button>
+        <button class="btn-main" onclick="saveSettings()">
+          <i class="fas fa-save"></i> Save Changes
+        </button>
+      </div>
+    </div>
+  </div>
+  <% } %>
+  
+  <!-- Scripts -->
+  <script src="/js/main.js"></script>
+  <script>
+    // Enhanced page loading
+    document.addEventListener('DOMContentLoaded', function() {
+      // Hide loading screen
+      const loading = document.getElementById('loading');
+      if (loading) {
+        setTimeout(() => {
+          loading.classList.add('hidden');
+          setTimeout(() => {
+            loading.style.display = 'none';
+          }, 500);
+        }, 800);
+      }
+      
+      // Show body with fade-in effect
+      setTimeout(() => {
+        document.body.classList.add('visible');
+      }, 300);
+      
+      // Preload critical images
+      const criticalImages = [
+        '/images/product/image-macaron-desktop.jpg',
+        '/images/product/image-cake-desktop.jpg'
+      ];
+      
+      criticalImages.forEach(src => {
+        const img = new Image();
+        img.src = src;
+      });
+    });
+    
+    // Performance monitoring
+    window.addEventListener('load', function() {
+      if ('performance' in window) {
+        const perfData = performance.getEntriesByType('navigation')[0];
+        if (perfData.loadEventEnd - perfData.loadEventStart > 3000) {
+          console.warn('Page load time is slow:', perfData.loadEventEnd - perfData.loadEventStart + 'ms');
+        }
+      }
+    });
+
+    // Global Settings Modal functionality
+    function openSettingsModal() {
+      const modal = document.getElementById('settingsModal');
+      if (modal) {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        
+        // Add entrance animation
+        setTimeout(() => {
+          modal.querySelector('.modal-container').style.transform = 'scale(1) translateY(0)';
+        }, 10);
+      }
+    }
+
+    function closeSettingsModal() {
+      const modal = document.getElementById('settingsModal');
+      if (modal) {
+        modal.querySelector('.modal-container').style.transform = 'scale(0.9) translateY(20px)';
+        
+        setTimeout(() => {
+          modal.classList.remove('active');
+          document.body.style.overflow = 'auto';
+        }, 300);
+      }
+    }
+
+    // Close modal when clicking outside
+    document.addEventListener('click', function(e) {
+      const modal = document.getElementById('settingsModal');
+      if (modal && e.target === modal) {
+        closeSettingsModal();
+      }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        const modal = document.getElementById('settingsModal');
+        if (modal && modal.classList.contains('active')) {
+          closeSettingsModal();
+        }
+      }
+    });
+
+    // Avatar upload functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const avatarInput = document.getElementById('avatarInput');
+      if (avatarInput) {
+        avatarInput.addEventListener('change', function(e) {
+          const file = e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+              const avatarPreview = document.getElementById('avatarPreview');
+              const navbarAvatar = document.getElementById('navbarUserAvatar');
+              
+              if (avatarPreview) {
+                avatarPreview.src = e.target.result;
+                
+                // Add success animation
+                avatarPreview.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                  avatarPreview.style.transform = 'scale(1)';
+                }, 200);
+              }
+              
+              // Update navbar avatar immediately
+              if (navbarAvatar) {
+                navbarAvatar.src = e.target.result;
+                
+                // Add animation to navbar avatar
+                navbarAvatar.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                  navbarAvatar.style.transform = 'scale(1)';
+                }, 200);
+              }
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      }
+
+      // Toggle switch animations
+      document.querySelectorAll('.toggle-switch input').forEach(toggle => {
+        toggle.addEventListener('change', function() {
+          const slider = this.nextElementSibling;
+          slider.style.transform = this.checked ? 'translateX(26px)' : 'translateX(0)';
+          
+          // Add ripple effect
+          const ripple = document.createElement('div');
+          ripple.style.cssText = `
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            background: rgba(67, 97, 238, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            animation: ripple 0.6s ease-out;
+            pointer-events: none;
+          `;
+          slider.appendChild(ripple);
+          
+          setTimeout(() => {
+            ripple.remove();
+          }, 600);
+        });
+      });
+
+      // Theme switching functionality
+      const themeSelect = document.getElementById('themeSelect');
+      if (themeSelect) {
+        themeSelect.addEventListener('change', function() {
+          const theme = this.value;
+          document.documentElement.setAttribute('data-theme', theme);
+          
+          // Add theme transition
+          document.body.style.transition = 'background-color 0.3s ease';
+          setTimeout(() => {
+            document.body.style.transition = '';
+          }, 300);
+        });
+      }
+    });
+
+    function removeAvatar() {
+      const avatarPreview = document.getElementById('avatarPreview');
+      const avatarInput = document.getElementById('avatarInput');
+      const navbarAvatar = document.getElementById('navbarUserAvatar');
+      
+      if (avatarPreview) {
+        avatarPreview.src = '/images/default-avatar.svg';
+      }
+      if (avatarInput) {
+        avatarInput.value = '';
+      }
+      if (navbarAvatar) {
+        navbarAvatar.src = '/images/default-avatar.svg';
+      }
+      
+      // Add removal animation
+      if (avatarPreview) {
+        avatarPreview.style.transform = 'scale(0.9)';
+        setTimeout(() => {
+          avatarPreview.style.transform = 'scale(1)';
+        }, 200);
+      }
+      
+      // Add animation to navbar avatar
+      if (navbarAvatar) {
+        navbarAvatar.style.transform = 'scale(0.9)';
+        setTimeout(() => {
+          navbarAvatar.style.transform = 'scale(1)';
+        }, 200);
+      }
+    }
+
+    // Save settings functionality
+    function saveSettings() {
+      const saveButton = document.querySelector('.modal-footer .btn-main');
+      if (!saveButton) return;
+      
+      const originalText = saveButton.innerHTML;
+      
+      // Show loading state
+      saveButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+      saveButton.disabled = true;
+      
+      // Get avatar data if changed
+      const avatarPreview = document.getElementById('avatarPreview');
+      const avatarData = avatarPreview ? avatarPreview.src : null;
+      
+      // Collect form data
+      const formData = {
+        name: document.getElementById('modalName')?.value || '',
+        email: document.getElementById('modalEmail')?.value || '',
+        phone: document.getElementById('modalPhone')?.value || '',
+        address: document.getElementById('modalAddress')?.value || '',
+        preferences: document.getElementById('modalPreferences')?.value || '',
+        showEmail: document.getElementById('showEmail')?.checked || false,
+        showPhone: document.getElementById('showPhone')?.checked || false,
+        showAddress: document.getElementById('showAddress')?.checked || false,
+        emailNotifications: document.getElementById('emailNotifications')?.checked || false,
+        theme: document.getElementById('themeSelect')?.value || 'light',
+        language: document.getElementById('languageSelect')?.value || 'en',
+        avatar: avatarData
+      };
+      
+      // Send to backend
+      fetch('/auth/settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Update navbar avatar if avatar was changed
+          if (data.user && data.user.avatar) {
+            const navbarAvatar = document.getElementById('navbarUserAvatar');
+            if (navbarAvatar) {
+              navbarAvatar.src = data.user.avatar;
+              
+              // Add success animation
+              navbarAvatar.style.transform = 'scale(1.2)';
+              setTimeout(() => {
+                navbarAvatar.style.transform = 'scale(1)';
+              }, 200);
+            }
+          }
+          
+          // Show success state
+          saveButton.innerHTML = '<i class="fas fa-check"></i> Saved!';
+          saveButton.style.background = '#a8e6cf';
+          
+          setTimeout(() => {
+            // Reset button
+            saveButton.innerHTML = originalText;
+            saveButton.disabled = false;
+            saveButton.style.background = '';
+            
+            // Close modal
+            closeSettingsModal();
+            
+            // Show success message
+            showNotification('Settings saved successfully!', 'success');
+            
+            // Update user name in navbar if changed
+            if (formData.name) {
+              const userNameSpan = document.querySelector('.nav-dropdown-toggle span');
+              if (userNameSpan) {
+                userNameSpan.textContent = formData.name;
+              }
+            }
+          }, 1000);
+        } else {
+          throw new Error(data.message || 'Failed to save settings');
+        }
+      })
+      .catch(error => {
+        console.error('Error saving settings:', error);
+        saveButton.innerHTML = originalText;
+        saveButton.disabled = false;
+        showNotification('Failed to save settings. Please try again.', 'error');
+      });
+    }
+
+    // Notification system
+    function showNotification(message, type = 'info') {
+      const notification = document.createElement('div');
+      notification.className = `notification notification-${type}`;
+      notification.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+        <span>${message}</span>
+      `;
+      
+      const bgColor = type === 'success' ? '#a8e6cf' : type === 'error' ? '#e74c3c' : '#4361EE';
+      
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${bgColor};
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(255, 107, 157, 0.08);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        z-index: 10001;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+      `;
+      
+      document.body.appendChild(notification);
+      
+      // Animate in
+      setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+      }, 10);
+      
+      // Remove after 3 seconds
+      setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+          notification.remove();
+        }, 300);
+      }, 3000);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<%- include('../../partials/_admin-navbar') %>
+<main class="admin-container fade-in">
+  <header class="admin-header">
+    <h1><i class="fas fa-user-shield"></i> Create Admin Account</h1>
+    <p>Add a new admin to your team</p>
+  </header>
+  <% if (success_msg) { %>
+    <div class="alert alert-success fade-in"><i class="fas fa-check-circle"></i> <%= success_msg %></div>
+  <% } %>
+  <% if (error_msg) { %>
+    <div class="alert alert-danger fade-in"><i class="fas fa-exclamation-circle"></i> <%= error_msg %></div>
+  <% } %>
+  <form action="/admin/users/new-admin" method="POST" class="admin-form fade-in" autocomplete="off">
+    <div class="form-group">
+      <label for="name">Full Name</label>
+      <input type="text" id="name" name="name" class="form-control" required autocomplete="off">
+    </div>
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" class="form-control" required autocomplete="off">
+    </div>
+    <div class="form-group password-group">
+      <label for="password">Password</label>
+      <div class="input-icon">
+        <input type="password" id="password" name="password" class="form-control" required autocomplete="new-password" aria-describedby="passwordHelp">
+        <button type="button" class="toggle-password" aria-label="Show password" tabindex="-1"><i class="fas fa-eye"></i></button>
+      </div>
+      <small id="passwordHelp" class="form-text">At least 8 characters, mix of letters and numbers.</small>
+    </div>
+    <div class="form-group password-group">
+      <label for="confirmPassword">Confirm Password</label>
+      <div class="input-icon">
+        <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" required autocomplete="new-password">
+        <button type="button" class="toggle-password" aria-label="Show password" tabindex="-1"><i class="fas fa-eye"></i></button>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary"><i class="fas fa-user-plus"></i> Create Admin</button>
+      <a href="/admin/users" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Cancel</a>
+    </div>
+  </form>
+</main>
+<script src="/js/main.js"></script>
+<script>
+// Password visibility toggle for both password fields
+(function() {
+  document.querySelectorAll('.toggle-password').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      const input = this.parentElement.querySelector('input');
+      if (input.type === 'password') {
+        input.type = 'text';
+        this.innerHTML = '<i class="fas fa-eye-slash"></i>';
+      } else {
+        input.type = 'password';
+        this.innerHTML = '<i class="fas fa-eye"></i>';
+      }
+    });
+  });
+})();
+</script>
+<!-- All admin styles are now in style.css --> 

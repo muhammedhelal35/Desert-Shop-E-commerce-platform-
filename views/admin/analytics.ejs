@@ -1,0 +1,97 @@
+<%- include('../partials/_admin-navbar') %>
+<main class="admin-container fade-in">
+  <header class="admin-header">
+    <h1><i class="fas fa-chart-bar"></i> Analytics & Reports</h1>
+    <p>Comprehensive insights into your store performance</p>
+  </header>
+  <section class="analytics-grid">
+    <div class="analytics-card fade-in">
+      <h5><i class="fas fa-calendar-alt"></i> Sales by Date (Last 30 Days)</h5>
+      <table class="analytics-table">
+        <thead>
+          <tr><th>Date</th><th>Orders</th><th>Total</th></tr>
+        </thead>
+        <tbody>
+          <% salesByDate.forEach(day => { %>
+            <tr>
+              <td><%= day._id %></td>
+              <td><%= day.count %></td>
+              <td><strong>$<%= day.total.toFixed(2) %></strong></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <div class="analytics-card fade-in">
+      <h5><i class="fas fa-user-friends"></i> Top Customers</h5>
+      <table class="analytics-table">
+        <thead>
+          <tr><th>Name</th><th>Email</th><th>Orders</th><th>Total Spent</th></tr>
+        </thead>
+        <tbody>
+          <% topCustomers.forEach(cust => { %>
+            <tr>
+              <td><%= cust.user.name %></td>
+              <td><%= cust.user.email %></td>
+              <td><%= cust.orders %></td>
+              <td><strong>$<%= cust.total.toFixed(2) %></strong></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <div class="analytics-card fade-in">
+      <h5><i class="fas fa-crown"></i> Most Sold Products</h5>
+      <table class="analytics-table">
+        <thead>
+          <tr><th>Product</th><th>Sold</th><th>Revenue</th></tr>
+        </thead>
+        <tbody>
+          <% mostSoldProducts.forEach(prod => { %>
+            <tr>
+              <td><%= prod.name %></td>
+              <td><%= prod.totalSold %></td>
+              <td><strong>$<%= prod.totalRevenue.toFixed(2) %></strong></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <div class="analytics-card fade-in">
+      <h5><i class="fas fa-tags"></i> Sales by Category</h5>
+      <table class="analytics-table">
+        <thead>
+          <tr><th>Category</th><th>Sold</th><th>Total</th></tr>
+        </thead>
+        <tbody>
+          <% salesByCategory.forEach(cat => { %>
+            <tr>
+              <td><%= cat._id %></td>
+              <td><%= cat.count %></td>
+              <td><strong>$<%= cat.total.toFixed(2) %></strong></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <div class="analytics-card fade-in" style="grid-column: 1 / -1;">
+      <h5><i class="fas fa-credit-card"></i> Payment Statistics</h5>
+      <table class="analytics-table">
+        <thead>
+          <tr><th>Status</th><th>Count</th><th>Total</th></tr>
+        </thead>
+        <tbody>
+          <% paymentStats.forEach(stat => { %>
+            <tr>
+              <td><%= stat._id %></td>
+              <td><%= stat.count %></td>
+              <td><strong>$<%= stat.total.toFixed(2) %></strong></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+  <a href="/admin/dashboard" class="btn btn-secondary mt-4" aria-label="Back to Dashboard"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+</main>
+<script src="/js/main.js"></script>

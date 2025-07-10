@@ -1,0 +1,90 @@
+<%- include('../../partials/_admin-navbar') %>
+<main class="admin-container fade-in">
+  <header class="admin-header">
+    <h1><i class="fas fa-plus"></i> Add New Product</h1>
+    <p>Create a new product for your store</p>
+  </header>
+  <div class="product-form fade-in">
+    <form action="/admin/products" method="POST" enctype="multipart/form-data" autocomplete="off">
+      <div class="form-group">
+        <label for="name">Product Name *</label>
+        <input type="text" id="name" name="name" class="form-control" required autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea id="description" name="description" class="form-control" rows="4"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="price">Price *</label>
+        <input type="number" id="price" name="price" class="form-control" step="0.01" min="0" required>
+      </div>
+      <div class="form-group">
+        <label for="category">Category *</label>
+        <select id="category" name="category" class="form-control" required>
+          <option value="">Select a category</option>
+          <option value="Cakes">Cakes</option>
+          <option value="Cookies">Cookies</option>
+          <option value="Ice Cream">Ice Cream</option>
+          <option value="Pastries">Pastries</option>
+          <option value="Pies">Pies</option>
+          <option value="Breads">Breads</option>
+          <option value="Desserts">Desserts</option>
+          <option value="Beverages">Beverages</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="stock">Stock Quantity *</label>
+        <input type="number" id="stock" name="stock" class="form-control" min="0" required>
+      </div>
+      <div class="form-group">
+        <label for="image">Product Image</label>
+        <input type="file" id="image" name="image" class="form-control" accept="image/*">
+        <small class="form-text">Supported formats: JPG, PNG, GIF, WebP (max 5MB)</small>
+      </div>
+      <div class="form-group checkbox-group">
+        <input type="checkbox" id="isActive" name="isActive" class="form-control" checked>
+        <label for="isActive">Active (available for purchase)</label>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" aria-label="Create Product"><i class="fas fa-plus"></i> Create Product</button>
+        <a href="/admin/products" class="btn btn-secondary" aria-label="Cancel"><i class="fas fa-arrow-left"></i> Cancel</a>
+      </div>
+    </form>
+  </div>
+</main>
+<script src="/js/main.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.querySelector('form');
+  const nameInput = document.getElementById('name');
+  const priceInput = document.getElementById('price');
+  const stockInput = document.getElementById('stock');
+  const categorySelect = document.getElementById('category');
+  form.addEventListener('submit', function(e) {
+    let isValid = true;
+    let errorMessage = '';
+    if (!nameInput.value.trim()) {
+      errorMessage += 'Product name is required.\n';
+      isValid = false;
+    }
+    if (!priceInput.value || priceInput.value <= 0) {
+      errorMessage += 'Price must be greater than 0.\n';
+      isValid = false;
+    }
+    if (!stockInput.value || stockInput.value < 0) {
+      errorMessage += 'Stock must be 0 or more.\n';
+      isValid = false;
+    }
+    if (!categorySelect.value) {
+      errorMessage += 'Category is required.\n';
+      isValid = false;
+    }
+    if (!isValid) {
+      alert(errorMessage);
+      e.preventDefault();
+    }
+  });
+});
+</script>
+<!-- All admin styles are now in style.css -->

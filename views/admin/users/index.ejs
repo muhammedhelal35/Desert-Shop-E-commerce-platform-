@@ -1,0 +1,45 @@
+<%- include('../../partials/_admin-navbar') %>
+<main class="admin-container fade-in">
+  <header class="admin-header">
+    <h1><i class="fas fa-users-cog"></i> User Management</h1>
+    <p>Manage user accounts and permissions</p>
+  </header>
+  <a href="/admin/users/new-admin" class="action-btn success" aria-label="Create Admin Account"><i class="fas fa-user-plus"></i> Create Admin Account</a>
+  <% if (users && users.length > 0) { %>
+    <div class="users-table fade-in">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Phone</th>
+            <th>Joined</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% users.forEach(user => { %>
+            <tr>
+              <td><strong><%= user.name %></strong></td>
+              <td><%= user.email %></td>
+              <td>
+                <span class="role-badge role-<%= user.role %>">
+                  <i class="fas fa-user<%= user.role === 'admin' ? '-shield' : '' %>"></i> <%= user.role %>
+                </span>
+              </td>
+              <td><%= user.phone || 'N/A' %></td>
+              <td><%= new Date(user.createdAt).toLocaleDateString() %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } else { %>
+    <div class="no-users fade-in">
+      <h3><i class="fas fa-user-slash"></i> No users found</h3>
+      <p>Users will appear here when they register.</p>
+    </div>
+  <% } %>
+</main>
+<script src="/js/main.js"></script>
+<!-- All admin styles are now in style.css -->

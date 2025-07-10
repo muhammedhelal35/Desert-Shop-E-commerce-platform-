@@ -1,0 +1,505 @@
+<% locals.title = errorCode ? `${errorCode} Error` : 'Error' %>
+
+<div class="error-container">
+  <div class="error-card">
+    <!-- Illustration Section -->
+    <div class="error-illustration" aria-hidden="true">
+      <% if (errorCode === '404') { %>
+        <img src="/images/404-illustration.svg" alt="" width="150" height="150">
+      <% } else if (errorCode === '403') { %>
+        <img src="/images/403-illustration.svg" alt="" width="150" height="150">
+      <% } else if (errorCode === '500') { %>
+        <img src="/images/500-illustration.svg" alt="" width="150" height="150">
+      <% } else { %>
+        <img src="/images/error-illustration.svg" alt="" width="150" height="150">
+      <% } %>
+    </div>
+    
+    <!-- Header Section -->
+    <header class="error-header">
+      <h1 class="error-code"><%= errorCode || 500 %></h1>
+      <h2 class="error-title"><%= errorMessage || 'Something went wrong' %></h2>
+    </header>
+    
+    <!-- Main Content Section -->
+    <main class="error-content">
+      <div class="error-message">
+        <p class="error-description">
+          <% if (errorCode === '404') { %>
+            The page you're looking for doesn't exist or has been moved.
+          <% } else if (errorCode === '403') { %>
+            You don't have permission to access this resource.
+          <% } else if (errorCode === '401') { %>
+            Please log in to access this resource.
+          <% } else if (errorCode === '400') { %>
+            The request couldn't be understood by the server due to malformed syntax.
+          <% } else if (errorCode === '500') { %>
+            We're experiencing some technical difficulties. Our team has been notified.
+          <% } else { %>
+            <%= errorDescription || 'We apologize, but an unexpected error has occurred. Our team has been notified.' %>
+          <% } %>
+        </p>
+        
+        <% if ((typeof showRetry !== 'undefined' && showRetry) && !['401', '403', '404'].includes(errorCode)) { %>
+          <button class="btn btn-secondary retry-btn" onclick="window.location.reload()" aria-label="Retry last action">
+            <i class="fas fa-sync-alt"></i> Try Again
+          </button>
+        <% } %>
+      </div>
+      
+      <!-- Action Buttons -->
+      <div class="error-actions" role="group" aria-label="Error recovery options">
+        <a href="/" class="btn btn-primary" aria-label="Return to home page">
+          <i class="fas fa-home"></i> Home
+        </a>
+        <button class="btn btn-secondary" onclick="window.history.back()" aria-label="Go back to previous page">
+          <i class="fas fa-arrow-left"></i> Back
+        </button>
+        <a href="/contact" class="btn btn-outline" aria-label="Contact support team">
+          <i class="fas fa-headset"></i> Support
+        </a>
+      </div>
+      
+      <!-- Debug Information (Dev only) -->
+      <% if (process.env.NODE_ENV === 'development' && typeof errorStack !== 'undefined' && errorStack) { %>
+        <details class="error-details">
+          <summary>Technical Details</summary>
+          <div class="error-stack-container">
+            <pre class="error-stack"><%= errorStack %></pre>
+            <button class="btn-copy" onclick="copyErrorDetails()" aria-label="Copy error details">
+              <i class="fas fa-copy"></i>
+            </button>
+          </div>
+        </details>
+      <% } %>
+      
+      <!-- Search Option for 404 errors -->
+      <% if (errorCode === '404') { %>
+        <div class="error-search">
+          <p>Can't find what you're looking for? Try searching:</p>
+          <form action="/search" method="get" role="search" class="search-form">
+            <div class="search-input-container">
+              <input type="search" name="q" placeholder="Search..." aria-label="Search website">
+              <button type="submit" class="btn btn-primary search-btn">
+                <i class="fas fa-search"></i> <span class="search-text">Search</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      <% } %>
+      
+      <!-- Suggested Links for Common Errors -->
+      <% if (errorCode === '404') { %>
+        <div class="suggested-links">
+          <h3>Popular Pages</h3>
+          <ul>
+            <li><a href="/products">Browse Products</a></li>
+            <li><a href="/about">About Us</a></li>
+            <li><a href="/contact">Contact Us</a></li>
+          </ul>
+        </div>
+      <% } %>
+    </main>
+    
+    <!-- Footer Section -->
+    <footer class="error-footer">
+      <p>Need immediate help? <a href="/contact" aria-label="Contact our support team">Contact our support team</a> or call us at <a href="tel:+18005551234">1-800-555-1234</a></p>
+      <div class="error-id">
+        <small>Error ID: <%= typeof errorId !== 'undefined' ? errorId : Date.now().toString(36) %></small>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<!-- Client-side script for enhanced functionality -->
+<script>
+  function copyErrorDetails() {
+    const errorStack = document.querySelector('.error-stack');
+    if (errorStack) {
+      navigator.clipboard.writeText(errorStack.textContent)
+        .then(() => {
+          const btn = document.querySelector('.btn-copy');
+          if (btn) {
+            btn.innerHTML = '<i class="fas fa-check"></i>';
+            setTimeout(() => {
+              btn.innerHTML = '<i class="fas fa-copy"></i>';
+            }, 2000);
+          }
+        })
+        .catch(err => {
+          console.error('Failed to copy: ', err);
+          alert('Failed to copy error details');
+        });
+    }
+  }
+  
+  // Focus on the first interactive element for better keyboard navigation
+  document.addEventListener('DOMContentLoaded', () => {
+    const firstInteractive = document.querySelector('.error-actions a, .error-actions button');
+    if (firstInteractive) firstInteractive.focus();
+    
+    // Add animation class after DOM is loaded
+    const errorCard = document.querySelector('.error-card');
+    if (errorCard) {
+      setTimeout(() => {
+        errorCard.classList.add('animate-in');
+      }, 100);
+    }
+  });
+</script>
+
+<style>
+  /* Enhanced CSS for better presentation */
+  .error-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 2rem;
+    background-color: #f8f9fa;
+    background-image: linear-gradient(to bottom right, #f8f9fa, #e9ecef);
+  }
+  
+  .error-card {
+    max-width: 650px;
+    width: 100%;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    text-align: center;
+    padding: 3rem;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  
+  .error-card.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  .error-illustration {
+    margin: 0 auto 2rem;
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+  }
+  
+  .error-header {
+    margin-bottom: 2rem;
+  }
+  
+  .error-code {
+    font-size: 5rem;
+    font-weight: 800;
+    color: #dc3545;
+    margin: 0;
+    line-height: 1;
+    text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+  }
+  
+  .error-title {
+    font-size: 2rem;
+    margin: 0.75rem 0 0;
+    color: #343a40;
+    font-weight: 600;
+  }
+  
+  .error-description {
+    color: #6c757d;
+    font-size: 1.2rem;
+    margin-bottom: 2.5rem;
+    line-height: 1.6;
+  }
+  
+  .error-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 2.5rem;
+  }
+  
+  .btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+  }
+  
+  .btn-primary {
+    background-color: #007bff;
+    color: white;
+    border: none;
+  }
+  
+  .btn-primary:hover {
+    background-color: #0069d9;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+  }
+  
+  .btn-secondary {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+  }
+  
+  .btn-secondary:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+  }
+  
+  .btn-outline {
+    background-color: transparent;
+    color: #007bff;
+    border: 2px solid #007bff;
+  }
+  
+  .btn-outline:hover {
+    background-color: #007bff;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+  }
+  
+  .retry-btn {
+    margin: 0 auto 2rem;
+    display: block;
+  }
+  
+  .error-details {
+    margin: 2.5rem 0;
+    text-align: left;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .error-details summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: #495057;
+    outline: none;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    transition: background-color 0.2s ease;
+  }
+  
+  .error-details summary:hover {
+    background-color: #e9ecef;
+  }
+  
+  .error-stack-container {
+    position: relative;
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 0 0 8px 8px;
+    max-height: 300px;
+    overflow: auto;
+  }
+  
+  .error-stack {
+    white-space: pre-wrap;
+    font-family: monospace;
+    margin: 0;
+    font-size: 0.9rem;
+    color: #495057;
+  }
+  
+  .btn-copy {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: #e9ecef;
+    border: none;
+    border-radius: 4px;
+    padding: 0.35rem 0.7rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .btn-copy:hover {
+    background-color: #ced4da;
+  }
+  
+  .error-search {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+  }
+  
+  .search-form {
+    margin-top: 1rem;
+  }
+  
+  .search-input-container {
+    display: flex;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  
+  .error-search input[type="search"] {
+    padding: 0.75rem 1rem;
+    border: 1px solid #ced4da;
+    border-radius: 8px 0 0 8px;
+    flex-grow: 1;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .error-search input[type="search"]:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  }
+  
+  .search-btn {
+    border-radius: 0 8px 8px 0;
+    padding: 0.75rem 1.5rem;
+  }
+  
+  .suggested-links {
+    margin-top: 2.5rem;
+    padding: 1.5rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+  }
+  
+  .suggested-links h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: #343a40;
+    font-size: 1.2rem;
+  }
+  
+  .suggested-links ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+  }
+  
+  .suggested-links li a {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background-color: white;
+    border-radius: 6px;
+    color: #007bff;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: 1px solid #dee2e6;
+  }
+  
+  .suggested-links li a:hover {
+    background-color: #007bff;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+  }
+  
+  .error-footer {
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e9ecef;
+    font-size: 1rem;
+    color: #6c757d;
+  }
+  
+  .error-footer a {
+    color: #007bff;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  
+  .error-footer a:hover {
+    color: #0056b3;
+    text-decoration: underline;
+  }
+  
+  .error-id {
+    margin-top: 1rem;
+    color: #adb5bd;
+  }
+  
+  @media (max-width: 768px) {
+    .error-card {
+      padding: 2rem;
+    }
+    
+    .error-code {
+      font-size: 4rem;
+    }
+    
+    .error-title {
+      font-size: 1.5rem;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .error-card {
+      padding: 1.5rem;
+      border-radius: 12px;
+    }
+    
+    .error-code {
+      font-size: 3rem;
+    }
+    
+    .error-title {
+      font-size: 1.25rem;
+    }
+    
+    .error-actions {
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .btn {
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .search-input-container {
+      flex-direction: column;
+    }
+    
+    .error-search input[type="search"] {
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+    }
+    
+    .search-btn {
+      border-radius: 8px;
+      width: 100%;
+    }
+    
+    .search-text {
+      display: inline;
+    }
+    
+    .suggested-links ul {
+      flex-direction: column;
+    }
+    
+    .suggested-links li a {
+      display: block;
+      text-align: center;
+    }
+  }
+</style>

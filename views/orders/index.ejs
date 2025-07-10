@@ -1,0 +1,60 @@
+<%- include('../partials/_flash') %>
+<div class="orders-container fade-in">
+  <h1 class="orders-title mb-2">My Orders</h1>
+  <% if (orders && orders.length > 0) { %>
+    <div class="orders-grid">
+      <% orders.forEach(order => { %>
+        <div class="order-card card fade-in">
+          <div class="order-card-header d-flex justify-between align-center">
+            <h6>Order #<%= order._id.toString().slice(-8) %></h6>
+            <span class="status-badge status-<%= order.status.toLowerCase() %>"><%= order.status.charAt(0).toUpperCase() + order.status.slice(1) %></span>
+          </div>
+          <div class="order-card-body">
+            <div class="mb-2 text-muted">Placed on <%= new Date(order.createdAt).toLocaleDateString() %></div>
+            <div class="mb-2">
+              <strong>Items:</strong>
+              <ul class="order-items-list">
+                <% order.items.forEach(item => { %>
+                  <li class="d-flex justify-between">
+                    <span><%= item.product ? item.product.name : 'Product not found' %></span>
+                    <span class="text-muted">x<%= item.quantity %></span>
+                  </li>
+                <% }) %>
+              </ul>
+            </div>
+            <div class="d-flex justify-between align-center mt-2">
+              <strong>Total: $<%= order.finalAmount.toFixed(2) %></strong>
+              <a href="/orders/<%= order._id %>" class="btn-secondary btn-sm">View Details</a>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } else { %>
+    <div class="empty-state card fade-in text-center mt-2">
+      <div class="empty-icon mb-2"><i class="fas fa-shopping-bag"></i></div>
+      <h4 class="text-muted">No orders yet</h4>
+      <p class="text-muted">Start shopping to see your orders here!</p>
+      <a href="/products" class="btn-main mt-2">Browse Products</a>
+    </div>
+  <% } %>
+</div>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<style>
+.orders-container { max-width: 1100px; margin: 0 auto; padding: 2rem 1rem; }
+.orders-title { font-size: 2.2rem; font-weight: 800; color: var(--primary-dark); margin-bottom: 2rem; }
+.orders-grid { display: flex; flex-wrap: wrap; gap: 2rem; }
+.order-card { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); padding: 1.5rem 1.2rem; min-width: 260px; flex: 1 1 320px; max-width: 350px; display: flex; flex-direction: column; justify-content: space-between; }
+.order-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.status-badge { padding: 0.3em 1em; border-radius: 12px; font-size: 0.95em; font-weight: 600; background: var(--accent-light); color: var(--primary-dark); }
+.status-badge.status-completed { background: #b8e7e0; color: #17694a; }
+.status-badge.status-pending { background: #ffe082; color: #b97a95; }
+.status-badge.status-cancelled { background: #ffcdd2; color: #b91c1c; }
+.order-items-list { list-style: none; padding: 0; margin: 0; }
+.order-items-list li { display: flex; justify-content: space-between; padding: 0.3rem 0; border-bottom: 1px solid var(--border); }
+.order-items-list li:last-child { border-bottom: none; }
+.mt-2 { margin-top: 1rem; } .mb-2 { margin-bottom: 1rem; }
+.empty-state { background: var(--primary-light); border-radius: var(--radius); box-shadow: var(--shadow); padding: 2rem 1.5rem; margin-top: 1.5rem; }
+.empty-icon { font-size: 2.5rem; margin-bottom: 1rem; color: var(--muted); }
+@media (max-width: 900px) { .orders-grid { flex-direction: column; gap: 1.2rem; } .orders-title { font-size: 2rem; } }
+</style> 

@@ -1,0 +1,220 @@
+<div class="auth-bg-gradient"></div>
+<div class="auth-container fade-in d-flex align-center justify-center">
+  <div class="auth-illustration d-none d-md-flex align-center justify-center">
+    <img src="/images/register-banner.jpg" alt="Join our community" class="auth-banner rounded shadow mb-2">
+  </div>
+  <div class="auth-card card fade-in">
+    <div class="auth-header text-center">
+      <h1 class="auth-title mb-2">Create Your Account</h1>
+      <p class="auth-subtitle mb-2">Join our community today</p>
+      
+      <% if (success_msg) { %>
+        <div class="alert-success card fade-in mb-2"><%= success_msg %></div>
+      <% } %>
+      <% if (error_msg) { %>
+        <div class="alert-danger card fade-in mb-2"><%= error_msg %></div>
+      <% } %>
+    </div>
+
+    <form action="/auth/register" method="POST" class="auth-form fade-in" autocomplete="on" novalidate>
+      <div class="form-group mb-2">
+        <label for="name">Full Name</label>
+        <input 
+          type="text" 
+          id="name" 
+          name="name" 
+          class="form-control <%= typeof fieldErrors !== 'undefined' && fieldErrors.name ? 'is-invalid' : '' %>"
+          value="<%= typeof formData !== 'undefined' && formData.name ? formData.name : '' %>"
+          required
+          autocomplete="name"
+          autofocus
+        >
+        <% if (typeof fieldErrors !== 'undefined' && fieldErrors.name) { %>
+          <div class="invalid-feedback"><%= fieldErrors.name %></div>
+        <% } %>
+      </div>
+
+      <div class="form-group mb-2">
+        <label for="email">Email Address</label>
+        <input 
+          type="email" 
+          id="email" 
+          name="email" 
+          class="form-control <%= typeof fieldErrors !== 'undefined' && fieldErrors.email ? 'is-invalid' : '' %>"
+          value="<%= typeof formData !== 'undefined' && formData.email ? formData.email : '' %>"
+          required
+          autocomplete="email"
+        >
+        <% if (typeof fieldErrors !== 'undefined' && fieldErrors.email) { %>
+          <div class="invalid-feedback"><%= fieldErrors.email %></div>
+        <% } %>
+      </div>
+
+      <div class="form-group mb-2">
+        <label for="password">Password</label>
+        <div class="password-input">
+          <input 
+            type="password" 
+            id="password" 
+            name="password" 
+            class="form-control <%= typeof fieldErrors !== 'undefined' && fieldErrors.password ? 'is-invalid' : '' %>"
+            required
+            autocomplete="new-password"
+          >
+          <button type="button" class="toggle-password" aria-label="Show password">
+            <i class="fas fa-eye"></i>
+          </button>
+        </div>
+        <div id="password-strength-container" class="password-strength-container">
+          <div id="password-strength" class="password-strength"></div>
+        </div>
+        <% if (typeof fieldErrors !== 'undefined' && fieldErrors.password) { %>
+          <div class="invalid-feedback"><%= fieldErrors.password %></div>
+        <% } else { %>
+          <small class="form-text text-muted">
+            Must be at least 8 characters with uppercase, lowercase, number, and special character
+          </small>
+        <% } %>
+      </div>
+
+      <div class="form-group mb-2">
+        <label for="phone">Phone Number (Optional)</label>
+        <input 
+          type="tel" 
+          id="phone" 
+          name="phone" 
+          class="form-control"
+          value="<%= typeof formData !== 'undefined' && formData.phone ? formData.phone : '' %>"
+          autocomplete="tel"
+        >
+      </div>
+
+      <div class="form-group form-check mb-2">
+        <input type="checkbox" id="terms" name="terms" class="form-check-input" required>
+        <label for="terms" class="form-check-label">
+          I agree to the <a href="/terms" target="_blank">Terms of Service</a> and <a href="/privacy" target="_blank">Privacy Policy</a>
+        </label>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100 mt-2">
+        <i class="fas fa-user-plus"></i> Create Account
+      </button>
+    </form>
+
+    <div class="auth-divider fade-in">
+      <span>or sign up with</span>
+    </div>
+
+    <div class="social-auth fade-in d-flex gap-2 justify-center">
+      <a href="/auth/google" class="btn btn-secondary btn-social" aria-label="Sign up with Google">
+        <i class="fab fa-google"></i> Google
+      </a>
+      <a href="/auth/facebook" class="btn btn-secondary btn-social" aria-label="Sign up with Facebook">
+        <i class="fab fa-facebook-f"></i> Facebook
+      </a>
+    </div>
+
+    <div class="auth-footer fade-in text-center mt-2">
+      Already have an account? <a href="/auth/login">Sign in</a>
+    </div>
+  </div>
+</div>
+
+<style>
+.auth-bg-gradient {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  z-index: 0;
+  background: linear-gradient(120deg, var(--primary-light) 0%, #f8e1f4 100%);
+  opacity: 0.7;
+}
+.auth-container {
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2.5rem;
+}
+.auth-illustration img { box-shadow: 0 8px 32px rgba(37,99,235,0.13); border-radius: 22px; max-width:340px; width:100%; object-fit:cover; }
+.auth-card { box-shadow: 0 8px 32px rgba(37,99,235,0.13); border-radius: 22px; background: rgba(255,255,255,0.97); padding: 2.5rem 2rem; }
+.auth-form .form-group { margin-bottom: 1.5rem; }
+.btn-primary, .btn-secondary, .btn-social { font-size: 1.15rem; padding: 1rem 0; border-radius: 22px; min-height: 48px; font-weight: 700; }
+.btn-primary { background: linear-gradient(90deg, var(--primary) 60%, var(--accent) 100%); color: #fff; border: none; }
+.btn-primary:hover { background: linear-gradient(90deg, var(--accent) 0%, var(--primary-dark) 100%); }
+.btn-secondary, .btn-social { background: var(--primary-light); color: var(--primary-dark); border: none; margin: 0 0.25rem; }
+.btn-secondary:hover, .btn-social:hover { background: var(--accent-light); color: var(--primary-dark); }
+.auth-divider { margin: 2rem 0 1.5rem 0; text-align: center; position: relative; }
+.auth-divider span { background: #fff; padding: 0 1.2rem; color: var(--muted); position: relative; z-index: 1; }
+.auth-divider:before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: var(--border); z-index: 0; }
+.social-auth { display: flex; justify-content: center; gap: 1rem; margin-bottom: 1.5rem; }
+.auth-footer { margin-top: 2rem; }
+@media (max-width: 900px) {
+  .auth-container { flex-direction: column; gap: 0; }
+  .auth-illustration { display: none !important; }
+  .auth-card { margin: 2rem auto; }
+}
+@media (max-width: 600px) {
+  .auth-card { padding: 1.2rem 0.5rem; }
+  .auth-form .form-group { margin-bottom: 1rem; }
+  .btn-primary, .btn-secondary, .btn-social { font-size: 1rem; min-height: 42px; }
+}
+</style>
+
+<script src="/js/main.js"></script>
+<script>
+  // Toggle password visibility
+  document.querySelector('.toggle-password')?.addEventListener('click', function() {
+    const passwordInput = document.getElementById('password');
+    const icon = this.querySelector('i');
+    
+    if (passwordInput.type === 'password') {
+      passwordInput.type = 'text';
+      icon.classList.replace('fa-eye', 'fa-eye-slash');
+    } else {
+      passwordInput.type = 'password';
+      icon.classList.replace('fa-eye-slash', 'fa-eye');
+    }
+  });
+
+  // Password strength indicator
+  const passwordInput = document.getElementById('password');
+  const strengthBar = document.getElementById('password-strength');
+  const strengthContainer = document.getElementById('password-strength-container');
+  if (passwordInput && strengthBar && strengthContainer) {
+    passwordInput.addEventListener('input', function() {
+      const password = this.value;
+      if (password.length > 0) {
+        strengthContainer.style.display = 'block';
+      } else {
+        strengthContainer.style.display = 'none';
+        return;
+      }
+      let strength = 0;
+      if (password.length >= 8) strength += 25;
+      if (/[A-Z]/.test(password)) strength += 25;
+      if (/[a-z]/.test(password)) strength += 25;
+      if (/[0-9!@#$%^&*(),.?":{}|<>]/.test(password)) strength += 25;
+      strengthBar.style.width = strength + '%';
+      if (strength <= 25) strengthBar.style.backgroundColor = '#dc3545';
+      else if (strength <= 50) strengthBar.style.backgroundColor = '#ffc107';
+      else if (strength <= 75) strengthBar.style.backgroundColor = '#17a2b8';
+      else strengthBar.style.backgroundColor = '#28a745';
+    });
+  }
+
+  // Focus on first error field
+  document.addEventListener('DOMContentLoaded', () => {
+    const errorField = document.querySelector('.is-invalid');
+    if (errorField) errorField.focus();
+    
+    // Add font awesome for icons if not already loaded
+    if (!document.querySelector('link[href*="font-awesome"]')) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css';
+      document.head.appendChild(link);
+    }
+  });
+</script>

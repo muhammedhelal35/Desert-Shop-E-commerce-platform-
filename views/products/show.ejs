@@ -1,0 +1,228 @@
+<div class="product-container fade-in premium-product-detail">
+  <div class="product-header card fade-in">
+    <h1 class="product-title"><%= product.name %></h1>
+    <button id="wishlistBtn" class="btn-favorite" title="Add to Wishlist">
+      <i class="<%= user && user.wishlist && user.wishlist.includes(product._id) ? 'fas' : 'far' %> fa-heart"></i>
+    </button>
+    <div class="product-rating">
+      <span class="stars">
+        <% for(let i = 1; i <= 5; i++) { %>
+          <i class="fas fa-star <%= i <= product.averageRating ? 'text-warning' : 'text-muted' %>"></i>
+        <% } %>
+      </span>
+      <span class="text-muted">(<%= product.numReviews %> reviews)</span>
+    </div>
+  </div>
+  <div class="product-grid">
+    <div class="product-image card fade-in">
+      <img src="<%= product.image %>" alt="<%= product.name %>" class="rounded shadow">
+    </div>
+    <div class="product-details card fade-in">
+      <div class="product-price">
+        $<%= product.price %>
+        <% if (product.discount && product.discount.percentage > 0) { %>
+          <span class="original-price">$<%= product.originalPrice %></span>
+          <span class="discount-badge"><%= product.discount.percentage %>% OFF</span>
+        <% } %>
+      </div>
+      <div class="product-description text-muted mb-2">
+        <%= product.description %>
+      </div>
+      <form class="add-to-cart-form" id="addToCartForm" action="/cart/add" method="POST">
+        <input type="hidden" name="productId" value="<%= product._id %>">
+        <label for="quantity">Quantity</label>
+        <div class="quantity-controls">
+          <button type="button" id="decreaseQty" class="btn-qty">−</button>
+          <input type="number" name="quantity" id="quantity" class="quantity-input" value="1" min="1" max="20">
+          <button type="button" id="increaseQty" class="btn-qty">+</button>
+        </div>
+        <button type="submit" class="btn-main w-100 mt-2" id="addToCartBtn">Add to Cart</button>
+        <button type="button" class="btn-secondary w-100 mt-2" id="removeFromCartBtn" style="display:none;">Remove from Cart</button>
+      </form>
+      <div class="product-info mt-2">
+        <h5>Product Info</h5>
+        <ul>
+          <li><strong>Category:</strong> <%= product.category %></li>
+          <li><strong>Stock:</strong> <%= product.stock %> available</li>
+          <li><strong>SKU:</strong> <%= product.sku %></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="reviews-section card fade-in mt-4">
+    <h3 class="mb-2">Customer Reviews</h3>
+    <form class="review-form mb-2" action="/products/<%= product._id %>/review" method="POST">
+      <div class="rating-input">
+        <% for(let i = 1; i <= 5; i++) { %>
+          <i class="far fa-star" data-value="<%= i %>"></i>
+        <% } %>
+      </div>
+      <textarea name="review" rows="3" placeholder="Write your review..." required></textarea>
+      <button type="submit" class="btn-secondary mt-2">Submit Review</button>
+    </form>
+    <% if (product.reviews && product.reviews.length > 0) { %>
+      <% product.reviews.forEach(review => { %>
+        <div class="review-item mb-2">
+          <div class="review-header d-flex justify-between align-center">
+            <span class="h5"><%= review.user %></span>
+            <span class="stars">
+              <% for(let i = 1; i <= 5; i++) { %>
+                <i class="fas fa-star <%= i <= review.rating ? 'text-warning' : 'text-muted' %>"></i>
+              <% } %>
+            </span>
+          </div>
+          <div class="review-body text-muted">
+            <%= review.comment %>
+          </div>
+        </div>
+      <% }); %>
+    <% } else { %>
+      <div class="text-center text-muted">No reviews yet.</div>
+    <% } %>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Only declare stock once for use in all scripts
+  var productStock = Number('<%= product.stock %>');
+
+  // Wishlist (favorite) button AJAX
+  const wishlistBtn = document.getElementById('wishlistBtn');
+  if (wishlistBtn) {
+    wishlistBtn.addEventListener('click', async function(e) {
+      e.preventDefault();
+      wishlistBtn.disabled = true;
+      const isFav = wishlistBtn.querySelector('i').classList.contains('fas');
+      const url = isFav ? '/wishlist/remove/<%= product._id %>' : '/wishlist/add/<%= product._id %>';
+      try {
+        const res = await fetch(url, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' } });
+        if (res.ok) {
+          wishlistBtn.querySelector('i').classList.toggle('fas');
+          wishlistBtn.querySelector('i').classList.toggle('far');
+          wishlistBtn.title = isFav ? 'Add to Wishlist' : 'Remove from Wishlist';
+          wishlistBtn.classList.add('wishlist-success');
+          setTimeout(() => wishlistBtn.classList.remove('wishlist-success'), 600);
+        } else if (res.status === 401 || res.redirected) {
+          window.location.href = '/auth/login';
+        } else {
+          alert('Error updating wishlist.');
+        }
+      } catch (err) {
+        alert('Network error. Please try again.');
+      } finally {
+        wishlistBtn.disabled = false;
+      }
+    });
+  }
+  // Quantity controls
+  const qtyInput = document.getElementById('quantity');
+  const increaseBtn = document.getElementById('increaseQty');
+  const decreaseBtn = document.getElementById('decreaseQty');
+  function updateQtyButtons() {
+    decreaseBtn.disabled = parseInt(qtyInput.value) <= 1;
+    increaseBtn.disabled = parseInt(qtyInput.value) >= productStock;
+  }
+  if (increaseBtn && decreaseBtn && qtyInput) {
+    increaseBtn.onclick = function() {
+      let val = parseInt(qtyInput.value);
+      if (val < productStock) {
+        qtyInput.value = val + 1;
+        updateQtyButtons();
+      }
+    };
+    decreaseBtn.onclick = function() {
+      let val = parseInt(qtyInput.value);
+      if (val > 1) {
+        qtyInput.value = val - 1;
+        updateQtyButtons();
+      }
+    };
+    qtyInput.addEventListener('input', updateQtyButtons);
+    updateQtyButtons();
+  }
+});
+</script>
+
+<script>
+// Rating input functionality
+document.querySelectorAll('.rating-input i').forEach(star => {
+  star.addEventListener('click', function() {
+    const rating = this.dataset.rating;
+    document.getElementById('rating').value = rating;
+    
+    // Update star display
+    document.querySelectorAll('.rating-input i').forEach(s => {
+      if (s.dataset.rating <= rating) {
+        s.classList.remove('far');
+        s.classList.add('fas');
+      } else {
+        s.classList.remove('fas');
+        s.classList.add('far');
+      }
+    });
+  });
+});
+
+// Add to cart form validation and UX enhancement
+const addToCartForm = document.getElementById('addToCartForm');
+if (addToCartForm) {
+  addToCartForm.addEventListener('submit', function(e) {
+    const quantity = parseInt(document.getElementById('quantity').value);
+    if (quantity > productStock) {
+      e.preventDefault();
+      alert('Quantity cannot exceed available stock (' + productStock + ' units)');
+      return false;
+    }
+    if (quantity <= 0) {
+      e.preventDefault();
+      alert('Quantity must be at least 1');
+      return false;
+    }
+    // UX: show loading state
+    const btn = document.getElementById('addToCartBtn');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+    }
+    // Update cart count in sessionStorage for instant navbar update
+    let cartCount = sessionStorage.getItem('cartCount');
+    cartCount = cartCount ? parseInt(cartCount) : 0;
+    sessionStorage.setItem('cartCount', cartCount + quantity);
+  });
+}
+
+// Review form validation
+if (document.getElementById('reviewForm')) {
+  document.getElementById('reviewForm').addEventListener('submit', function(e) {
+    const rating = document.getElementById('rating').value;
+    const comment = document.getElementById('comment').value.trim();
+    
+    if (!rating) {
+      e.preventDefault();
+      alert('Please select a rating');
+      return false;
+    }
+    
+    if (!comment) {
+      e.preventDefault();
+      alert('Please write a review comment');
+      return false;
+    }
+  });
+}
+
+// Remove from Cart button (AJAX, optional: show if in cart)
+const removeFromCartBtn = document.getElementById('removeFromCartBtn');
+if (removeFromCartBtn) {
+  removeFromCartBtn.addEventListener('click', async function() {
+    const res = await fetch('/cart/remove/<%= product._id %>', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' } });
+    if (res.ok) {
+      alert('Removed from cart');
+      // Optionally update UI
+    } else {
+      alert('Error removing from cart.');
+    }
+  });
+}
+</script> 

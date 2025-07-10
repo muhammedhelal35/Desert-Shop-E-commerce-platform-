@@ -1,0 +1,61 @@
+<%- include('../partials/_admin-navbar') %>
+<main class="admin-dashboard fade-in">
+  <header class="admin-header">
+    <h1><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h1>
+    <p>Welcome, <%= adminName %>! Here's an overview of your store's performance.</p>
+  </header>
+  <section class="dashboard-stats-grid">
+    <% stats.forEach(stat => { %>
+      <div class="stats-card fade-in">
+        <div class="card-title"><i class="<%= stat.icon %>"></i> <%= stat.title %></div>
+        <div class="card-text"><%= stat.value %></div>
+      </div>
+    <% }) %>
+  </section>
+  <section class="quick-actions">
+    <h3>Quick Actions</h3>
+    <div class="quick-actions-grid">
+      <a href="/admin/products/new" class="action-btn success" aria-label="Add Product"><i class="fas fa-plus"></i> Add Product</a>
+      <a href="/admin/orders" class="action-btn warning" aria-label="View Orders"><i class="fas fa-clipboard-list"></i> Orders</a>
+      <a href="/admin/users" class="action-btn secondary" aria-label="Manage Users"><i class="fas fa-users-cog"></i> Users</a>
+      <a href="/admin/analytics" class="action-btn" aria-label="Analytics"><i class="fas fa-chart-line"></i> Analytics</a>
+    </div>
+  </section>
+  <section class="dashboard-data-grid">
+    <div class="data-card fade-in">
+      <div class="card-title"><i class="fas fa-box"></i> Recent Products</div>
+      <ul class="list-group">
+        <% recentProducts.forEach(product => { %>
+          <li class="list-group-item">
+            <span><%= product.name %></span>
+            <span class="badge badge-pill badge-info">$<%= product.price.toFixed(2) %></span>
+          </li>
+        <% }) %>
+      </ul>
+    </div>
+    <div class="data-card fade-in">
+      <div class="card-title"><i class="fas fa-shopping-bag"></i> Recent Orders</div>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Order</th>
+            <th>Customer</th>
+            <th>Status</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% recentOrders.forEach(order => { %>
+            <tr>
+              <td><%= order._id.toString().substring(0,8) %>...</td>
+              <td><%= order.user ? order.user.name : 'Guest' %></td>
+              <td><span class="status-badge status-<%= order.status.toLowerCase() %>"><%= order.status %></span></td>
+              <td><%= new Date(order.createdAt).toLocaleDateString() %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+<script src="/js/main.js"></script>

@@ -1,0 +1,1291 @@
+<div class="profile-container fade-in">
+  <div class="profile-header card fade-in">
+    <h1>My Profile</h1>
+    <p>Manage your account settings and view your order history</p>
+    <button class="btn-main mt-2" onclick="openSettingsModal()">
+      <i class="fas fa-cog"></i> Settings
+    </button>
+  </div>
+
+  <% if (success_msg && success_msg.length > 0) { %>
+    <div class="alert-success card fade-in mb-2"><%= success_msg %></div>
+  <% } %>
+  
+  <% if (error_msg && error_msg.length > 0) { %>
+    <div class="alert-danger card fade-in mb-2"><%= error_msg %></div>
+  <% } %>
+
+  <div class="profile-content">
+    <!-- Profile Information Section -->
+    <div class="profile-section card fade-in">
+      <h2>Profile Information</h2>
+      <form action="/auth/profile" method="POST" class="profile-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name">Full Name</label>
+            <input 
+              type="text" 
+              id="name" 
+              name="name" 
+              value="<%= user.name %>" 
+              class="form-control"
+              required
+            >
+          </div>
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input 
+              type="email" 
+              id="email" 
+              name="email" 
+              value="<%= user.email %>" 
+              class="form-control"
+              required
+            >
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input 
+              type="tel" 
+              id="phone" 
+              name="phone" 
+              value="<%= user.phone || '' %>" 
+              class="form-control"
+            >
+          </div>
+          <div class="form-group">
+            <label for="address">Address</label>
+            <textarea 
+              id="address" 
+              name="address" 
+              class="form-control"
+              rows="3"
+            ><%= user.address || '' %></textarea>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="preferences">Preferences</label>
+          <textarea 
+            id="preferences" 
+            name="preferences" 
+            class="form-control"
+            rows="3"
+            placeholder="Any special preferences or dietary restrictions..."
+          ><%= user.preferences || '' %></textarea>
+        </div>
+
+        <button type="submit" class="btn-main mt-2">Update Profile</button>
+      </form>
+    </div>
+
+    <!-- Order History Section -->
+    <div class="profile-section card fade-in">
+      <h2>Order History</h2>
+      <% if (user.orderHistory && user.orderHistory.length > 0) { %>
+        <div class="order-list">
+          <% user.orderHistory.forEach(function(order) { %>
+            <div class="order-item card fade-in">
+              <div class="order-header d-flex justify-between align-center">
+                <div class="order-info">
+                  <h4>Order #<%= order._id.toString().slice(-8) %></h4>
+                  <p class="order-date text-muted"><%= new Date(order.createdAt).toLocaleDateString() %></p>
+                </div>
+                <div class="order-status">
+                  <span class="status-badge status-<%= order.status.toLowerCase() %>"><%= order.status %></span>
+                </div>
+              </div>
+              <div class="order-details d-flex justify-between align-center">
+                <div class="order-items">
+                  <% order.items.forEach(function(item, idx) { %>
+                    <span class="order-item-name"><%= item.product ? item.product.name : 'Product' %> x<%= item.quantity %><%= idx < order.items.length - 1 ? ', ' : '' %></span>
+                  <% }) %>
+                </div>
+                <div class="order-total">
+                  <strong>$<%= order.totalAmount ? order.totalAmount.toFixed(2) : '0.00' %></strong>
+                </div>
+              </div>
+              <div class="order-actions mt-2">
+                <a href="/orders/<%= order._id %>" class="btn-secondary btn-sm">View Details</a>
+                <button class="btn-main btn-sm">Reorder</button>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      <% } else { %>
+        <div class="empty-state card fade-in text-center mt-2">
+          <div class="empty-icon mb-2">📦</div>
+          <h3>No Orders Yet</h3>
+          <p>Start shopping to see your order history here</p>
+          <a href="/products" class="btn-main mt-2">Browse Products</a>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- Wishlist Section -->
+    <div class="profile-section card fade-in">
+      <h2>My Wishlist</h2>
+      <% if (user.wishlist && user.wishlist.length > 0) { %>
+        <div class="wishlist-grid">
+          <% user.wishlist.forEach(function(item) { %>
+            <div class="wishlist-item card fade-in">
+              <img src="<%= item.image || '/images/placeholder.jpg' %>" alt="<%= item.name %>" class="rounded shadow">
+              <div class="wishlist-item-info">
+                <h4><%= item.name %></h4>
+                <p class="price">$<%= item.price ? item.price.toFixed(2) : '0.00' %></p>
+                <div class="wishlist-actions mt-2">
+                  <form action="/cart/add" method="POST" class="wishlist-add-to-cart-form" style="display:inline;">
+                    <input type="hidden" name="productId" value="<%= item._id %>">
+                    <input type="hidden" name="quantity" value="1">
+                    <button type="submit" class="btn-main btn-sm">Add to Cart</button>
+                  </form>
+                  <form action="/profile/wishlist/remove" method="POST" style="display:inline;">
+                    <input type="hidden" name="productId" value="<%= item._id %>">
+                    <button type="submit" class="btn-secondary btn-sm">Remove</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      <% } else { %>
+        <div class="empty-state card fade-in text-center mt-2">
+          <div class="empty-icon mb-2">❤️</div>
+          <h3>Your Wishlist is Empty</h3>
+          <p>Save your favorite items for later</p>
+          <a href="/products" class="btn-main mt-2">Discover Products</a>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- Account Actions Section -->
+    <div class="profile-section card fade-in">
+      <h2>Account Actions</h2>
+      <div class="account-actions d-flex gap-2 mt-2">
+        <a href="/auth/forgot" class="btn-secondary">Change Password</a>
+        <button class="btn-main" onclick="confirmDelete()">Delete Account</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Settings Modal -->
+  <div id="settingsModal" class="modal-overlay">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h2><i class="fas fa-user-cog"></i> Profile Settings</h2>
+        <button class="modal-close" onclick="closeSettingsModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="modal-content">
+        <!-- Profile Picture Section -->
+        <div class="settings-section">
+          <div class="section-header">
+            <i class="fas fa-camera"></i>
+            <h3>Profile Picture</h3>
+          </div>
+          <div class="avatar-upload">
+            <div class="avatar-preview">
+              <img id="avatarPreview" src="<%= user.avatar || '/images/default-avatar.svg' %>" alt="Profile Picture">
+              <div class="avatar-overlay">
+                <i class="fas fa-camera"></i>
+              </div>
+            </div>
+            <input type="file" id="avatarInput" accept="image/*" style="display: none;">
+            <button class="btn-secondary btn-sm" onclick="document.getElementById('avatarInput').click()">
+              <i class="fas fa-upload"></i> Upload Photo
+            </button>
+            <button class="btn-secondary btn-sm" onclick="removeAvatar()">
+              <i class="fas fa-trash"></i> Remove
+            </button>
+          </div>
+        </div>
+
+        <!-- Basic Info Section -->
+        <div class="settings-section">
+          <div class="section-header">
+            <i class="fas fa-user"></i>
+            <h3>Basic Information</h3>
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="modalName">Full Name</label>
+              <input type="text" id="modalName" value="<%= user.name %>" class="form-control">
+            </div>
+            <div class="form-group">
+              <label for="modalEmail">Email Address</label>
+              <input type="email" id="modalEmail" value="<%= user.email %>" class="form-control">
+            </div>
+            <div class="form-group">
+              <label for="modalPhone">Phone Number</label>
+              <input type="tel" id="modalPhone" value="<%= user.phone || '' %>" class="form-control">
+            </div>
+            <div class="form-group">
+              <label for="modalAddress">Address</label>
+              <textarea id="modalAddress" class="form-control" rows="3"><%= user.address || '' %></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Privacy Settings Section -->
+        <div class="settings-section">
+          <div class="section-header">
+            <i class="fas fa-shield-alt"></i>
+            <h3>Privacy Settings</h3>
+          </div>
+          <div class="privacy-options">
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <i class="fas fa-envelope"></i>
+                <div>
+                  <h4>Show Email to Others</h4>
+                  <p>Allow other users to see your email address</p>
+                </div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="showEmail" <%= user.showEmail ? 'checked' : '' %>>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <i class="fas fa-phone"></i>
+                <div>
+                  <h4>Show Phone Number</h4>
+                  <p>Display your phone number on your profile</p>
+                </div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="showPhone" <%= user.showPhone ? 'checked' : '' %>>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <i class="fas fa-map-marker-alt"></i>
+                <div>
+                  <h4>Show Address</h4>
+                  <p>Make your address visible to other users</p>
+                </div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="showAddress" <%= user.showAddress ? 'checked' : '' %>>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <i class="fas fa-bell"></i>
+                <div>
+                  <h4>Email Notifications</h4>
+                  <p>Receive email updates about orders and promotions</p>
+                </div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="emailNotifications" <%= user.emailNotifications ? 'checked' : '' %>>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Account Preferences Section -->
+        <div class="settings-section">
+          <div class="section-header">
+            <i class="fas fa-cog"></i>
+            <h3>Account Preferences</h3>
+          </div>
+          <div class="preferences-options">
+            <div class="preference-item">
+              <div class="preference-info">
+                <i class="fas fa-palette"></i>
+                <div>
+                  <h4>Theme</h4>
+                  <p>Choose your preferred color theme</p>
+                </div>
+              </div>
+              <select id="themeSelect" class="form-control">
+                <option value="light" <%= user.theme === 'light' ? 'selected' : '' %>>Light Mode</option>
+                <option value="dark" <%= user.theme === 'dark' ? 'selected' : '' %>>Dark Mode</option>
+                <option value="auto" <%= user.theme === 'auto' ? 'selected' : '' %>>Auto (System)</option>
+              </select>
+            </div>
+            
+            <div class="preference-item">
+              <div class="preference-info">
+                <i class="fas fa-language"></i>
+                <div>
+                  <h4>Language</h4>
+                  <p>Select your preferred language</p>
+                </div>
+              </div>
+              <select id="languageSelect" class="form-control">
+                <option value="en" <%= user.language === 'en' ? 'selected' : '' %>>English</option>
+                <option value="es" <%= user.language === 'es' ? 'selected' : '' %>>Español</option>
+                <option value="fr" <%= user.language === 'fr' ? 'selected' : '' %>>Français</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="modalPreferences">Dietary Preferences</label>
+              <textarea id="modalPreferences" class="form-control" rows="3" placeholder="Any special preferences or dietary restrictions..."><%= user.preferences || '' %></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeSettingsModal()">Cancel</button>
+        <button class="btn-main" onclick="saveSettings()">
+          <i class="fas fa-save"></i> Save Changes
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Modal functionality
+  function openSettingsModal() {
+    const modal = document.getElementById('settingsModal');
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    
+    // Add entrance animation
+    setTimeout(() => {
+      modal.querySelector('.modal-container').style.transform = 'scale(1) translateY(0)';
+    }, 10);
+  }
+
+  function closeSettingsModal() {
+    const modal = document.getElementById('settingsModal');
+    modal.querySelector('.modal-container').style.transform = 'scale(0.9) translateY(20px)';
+    
+    setTimeout(() => {
+      modal.classList.remove('active');
+      document.body.style.overflow = 'auto';
+    }, 300);
+  }
+
+  // Close modal when clicking outside
+  document.getElementById('settingsModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      closeSettingsModal();
+    }
+  });
+
+  // Close modal with Escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      const modal = document.getElementById('settingsModal');
+      if (modal.classList.contains('active')) {
+        closeSettingsModal();
+      }
+    }
+  });
+
+  // Avatar upload functionality
+  document.getElementById('avatarInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById('avatarPreview').src = e.target.result;
+        
+        // Add success animation
+        const avatar = document.getElementById('avatarPreview');
+        avatar.style.transform = 'scale(1.1)';
+        setTimeout(() => {
+          avatar.style.transform = 'scale(1)';
+        }, 200);
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  function removeAvatar() {
+    document.getElementById('avatarPreview').src = '/images/default-avatar.svg';
+    document.getElementById('avatarInput').value = '';
+    
+    // Add removal animation
+    const avatar = document.getElementById('avatarPreview');
+    avatar.style.transform = 'scale(0.9)';
+    setTimeout(() => {
+      avatar.style.transform = 'scale(1)';
+    }, 200);
+  }
+
+  // Toggle switch animations
+  document.querySelectorAll('.toggle-switch input').forEach(toggle => {
+    toggle.addEventListener('change', function() {
+      const slider = this.nextElementSibling;
+      slider.style.transform = this.checked ? 'translateX(26px)' : 'translateX(0)';
+      
+      // Add ripple effect
+      const ripple = document.createElement('div');
+      ripple.style.cssText = `
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 20px;
+        height: 20px;
+        background: rgba(67, 97, 238, 0.3);
+        border-radius: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        animation: ripple 0.6s ease-out;
+        pointer-events: none;
+      `;
+      slider.appendChild(ripple);
+      
+      setTimeout(() => {
+        ripple.remove();
+      }, 600);
+    });
+  });
+
+  // Save settings functionality
+  function saveSettings() {
+    const saveButton = document.querySelector('.modal-footer .btn-main');
+    const originalText = saveButton.innerHTML;
+    
+    // Show loading state
+    saveButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+    saveButton.disabled = true;
+    
+    // Collect form data
+    const formData = {
+      name: document.getElementById('modalName').value,
+      email: document.getElementById('modalEmail').value,
+      phone: document.getElementById('modalPhone').value,
+      address: document.getElementById('modalAddress').value,
+      preferences: document.getElementById('modalPreferences').value,
+      showEmail: document.getElementById('showEmail').checked,
+      showPhone: document.getElementById('showPhone').checked,
+      showAddress: document.getElementById('showAddress').checked,
+      emailNotifications: document.getElementById('emailNotifications').checked,
+      theme: document.getElementById('themeSelect').value,
+      language: document.getElementById('languageSelect').value
+    };
+    
+    // Simulate API call (replace with actual endpoint)
+    setTimeout(() => {
+      // Show success state
+      saveButton.innerHTML = '<i class="fas fa-check"></i> Saved!';
+      saveButton.style.background = 'var(--secondary)';
+      
+      setTimeout(() => {
+        // Reset button
+        saveButton.innerHTML = originalText;
+        saveButton.disabled = false;
+        saveButton.style.background = '';
+        
+        // Close modal
+        closeSettingsModal();
+        
+        // Show success message
+        showNotification('Settings saved successfully!', 'success');
+      }, 1000);
+    }, 1500);
+  }
+
+  // Theme switching functionality
+  document.getElementById('themeSelect').addEventListener('change', function() {
+    const theme = this.value;
+    document.documentElement.setAttribute('data-theme', theme);
+    
+    // Add theme transition
+    document.body.style.transition = 'background-color 0.3s ease';
+    setTimeout(() => {
+      document.body.style.transition = '';
+    }, 300);
+  });
+
+  // Notification system
+  function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+      <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i>
+      <span>${message}</span>
+    `;
+    
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: ${type === 'success' ? 'var(--secondary)' : '#4361EE'};
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius-small);
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      z-index: 10001;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Animate in
+    setTimeout(() => {
+      notification.style.transform = 'translateX(0)';
+    }, 10);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+      notification.style.transform = 'translateX(100%)';
+      setTimeout(() => {
+        notification.remove();
+      }, 300);
+    }, 3000);
+  }
+
+  // Add CSS for ripple animation
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes ripple {
+      to {
+        transform: translate(-50%, -50%) scale(2);
+        opacity: 0;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+
+  // Original functions
+  function confirmDelete() {
+    if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+      // Add delete account functionality here
+      alert('Account deletion feature coming soon!');
+    }
+  }
+
+  document.querySelectorAll('.wishlist-add-to-cart-form').forEach(form => {
+    form.addEventListener('submit', function() {
+      let cartCount = sessionStorage.getItem('cartCount');
+      cartCount = cartCount ? parseInt(cartCount) : 0;
+      sessionStorage.setItem('cartCount', cartCount + 1);
+    });
+  });
+</script>
+
+<style>
+  .profile-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  .profile-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    background: var(--primary-light);
+    color: var(--primary-dark);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 2rem 1.5rem;
+  }
+
+  .profile-header h1 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--primary-dark);
+  }
+
+  .profile-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .profile-section {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 2rem 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .profile-section h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #343a40;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e9ecef;
+  }
+
+  .profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .form-row {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .form-group {
+    flex: 1 1 220px;
+    margin-bottom: 1.2rem;
+  }
+
+  .form-group label {
+    font-weight: 600;
+    color: #495057;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 1rem 1.2rem;
+    border-radius: var(--radius);
+    border: 1.5px solid var(--border);
+    background: #fff;
+    font-size: 1rem;
+    margin-bottom: 0.7rem;
+    transition: border var(--transition), box-shadow var(--transition);
+  }
+
+  .form-control:focus {
+    outline: none;
+    border: 2px solid var(--primary);
+    box-shadow: 0 2px 8px rgba(231, 184, 201, 0.10);
+  }
+
+  .btn-main, .btn-secondary {
+    margin-right: 0.7rem;
+  }
+
+  .mt-2 {
+    margin-top: 1rem;
+  }
+
+  .mb-2 {
+    margin-bottom: 1rem;
+  }
+
+  .gap-2 {
+    gap: 1rem;
+  }
+
+  .btn-sm {
+    font-size: 0.95rem;
+    padding: 0.5rem 1.2rem;
+  }
+
+  .order-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+
+  .order-item {
+    background: var(--primary-light);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 1.2rem 1rem;
+    margin-bottom: 0.7rem;
+  }
+
+  .order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.7rem;
+  }
+
+  .order-date {
+    font-size: 0.95rem;
+    color: var(--muted);
+  }
+
+  .status-badge {
+    padding: 0.3em 1em;
+    border-radius: 12px;
+    font-size: 0.95em;
+    font-weight: 600;
+    background: var(--accent-light);
+    color: var(--primary-dark);
+  }
+
+  .status-badge.status-completed {
+    background: #b8e7e0;
+    color: #17694a;
+  }
+
+  .status-badge.status-pending {
+    background: #ffe082;
+    color: #b97a95;
+  }
+
+  .status-badge.status-cancelled {
+    background: #ffcdd2;
+    color: #b91c1c;
+  }
+
+  .order-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.2rem;
+  }
+
+  .order-items {
+    font-size: 1rem;
+    color: var(--primary-dark);
+  }
+
+  .order-total {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary);
+  }
+
+  .order-actions {
+    display: flex;
+    gap: 0.7rem;
+    margin-top: 0.7rem;
+  }
+
+  .empty-state {
+    background: var(--primary-light);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 2rem 1.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .empty-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .empty-state h3 {
+    margin-bottom: 0.5rem;
+    color: #343a40;
+  }
+
+  .empty-state p {
+    color: #6c757d;
+    margin-bottom: 1.5rem;
+  }
+
+  .account-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .wishlist-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.2rem;
+  }
+
+  .wishlist-item {
+    background: var(--primary-light);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 1.2rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    min-width: 220px;
+    max-width: 350px;
+  }
+
+  .wishlist-item img {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+
+  .wishlist-item-info {
+    flex: 1;
+  }
+
+  .price {
+    color: var(--primary);
+    font-weight: 700;
+  }
+
+  .wishlist-actions {
+    display: flex;
+    gap: 0.7rem;
+  }
+
+  @media (max-width: 900px) {
+    .profile-form .form-row {
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .order-details {
+      flex-direction: column;
+      gap: 0.7rem;
+    }
+
+    .wishlist-grid {
+      flex-direction: column;
+      gap: 1rem;
+    }
+  }
+
+  /* Modal Styles */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    opacity: 0;
+    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Dark mode support */
+  [data-theme="dark"] .modal-container {
+    background: #1a1a1a;
+    color: #ffffff;
+    border-color: #333;
+  }
+
+  [data-theme="dark"] .modal-header {
+    background: #2a2a2a;
+    border-bottom-color: #333;
+  }
+
+  [data-theme="dark"] .modal-footer {
+    background: #2a2a2a;
+    border-top-color: #333;
+  }
+
+  [data-theme="dark"] .toggle-item {
+    background: #2a2a2a;
+    border-color: #333;
+  }
+
+  [data-theme="dark"] .toggle-item:hover {
+    background: #3a3a3a;
+  }
+
+  [data-theme="dark"] .form-control {
+    background: #2a2a2a;
+    border-color: #333;
+    color: #ffffff;
+  }
+
+  [data-theme="dark"] .form-control:focus {
+    border-color: #4361EE;
+  }
+
+  .modal-overlay.active {
+    display: flex;
+    opacity: 1;
+  }
+
+  .modal-container {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    transform: scale(0.9) translateY(20px);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid var(--border);
+  }
+
+  .modal-overlay.active .modal-container {
+    transform: scale(1) translateY(0);
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--primary-light);
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+
+  .modal-header h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .modal-close {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: var(--radius-small);
+    transition: all var(--transition-fast);
+  }
+
+  .modal-close:hover {
+    background: var(--accent-bg);
+    color: var(--accent-dark);
+    transform: scale(1.1);
+  }
+
+  .modal-content {
+    padding: 2rem;
+  }
+
+  .settings-section {
+    margin-bottom: 2rem;
+  }
+
+  .settings-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 2px solid var(--border-light);
+  }
+
+  .section-header i {
+    font-size: 1.2rem;
+    color: #4361EE;
+    width: 24px;
+    text-align: center;
+  }
+
+  .section-header h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0;
+  }
+
+  /* Avatar Upload Styles */
+  .avatar-upload {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .avatar-preview {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    transition: transform var(--transition);
+  }
+
+  .avatar-preview:hover {
+    transform: scale(1.05);
+  }
+
+  .avatar-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .avatar-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity var(--transition);
+  }
+
+  .avatar-preview:hover .avatar-overlay {
+    opacity: 1;
+  }
+
+  .avatar-overlay i {
+    color: white;
+    font-size: 1.5rem;
+  }
+
+  /* Form Grid */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+
+  /* Privacy Toggle Styles */
+  .privacy-options {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .toggle-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: var(--primary-light);
+    border-radius: var(--radius-small);
+    border: 1px solid var(--border);
+    transition: all var(--transition);
+  }
+
+  .toggle-item:hover {
+    background: var(--accent-bg);
+    border-color: var(--accent-light);
+    transform: translateX(5px);
+  }
+
+  .toggle-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+  }
+
+  .toggle-info i {
+    font-size: 1.1rem;
+    color: #4361EE;
+    width: 20px;
+    text-align: center;
+  }
+
+  .toggle-info h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0 0 0.2rem 0;
+  }
+
+  .toggle-info p {
+    font-size: 0.9rem;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  /* Toggle Switch */
+  .toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+    cursor: pointer;
+  }
+
+  .toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: var(--transition);
+    border-radius: 24px;
+  }
+
+  .toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: var(--transition);
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .toggle-switch input:checked + .toggle-slider {
+    background-color: #4361EE;
+  }
+
+  .toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(26px);
+  }
+
+  /* Preferences Styles */
+  .preferences-options {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .preference-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .preference-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+  }
+
+  .preference-info i {
+    font-size: 1.1rem;
+    color: #4361EE;
+    width: 20px;
+    text-align: center;
+  }
+
+  .preference-info h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0 0 0.2rem 0;
+  }
+
+  .preference-info p {
+    font-size: 0.9rem;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  .preference-item select {
+    min-width: 150px;
+  }
+
+  /* Modal Footer */
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding: 1.5rem 2rem;
+    border-top: 1px solid var(--border);
+    background: var(--primary-light);
+    border-radius: 0 0 var(--radius) var(--radius);
+  }
+
+  .modal-footer button {
+    padding: 0.8rem 1.5rem;
+    border-radius: var(--radius-small);
+    font-weight: 600;
+    transition: all var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .modal-footer .btn-main:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+  }
+
+  .modal-footer .btn-secondary:hover {
+    background: var(--border);
+    transform: translateY(-2px);
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .modal-container {
+      width: 95%;
+      max-height: 95vh;
+    }
+
+    .modal-content {
+      padding: 1.5rem;
+    }
+
+    .form-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .preference-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.8rem;
+    }
+
+    .preference-item select {
+      width: 100%;
+      min-width: auto;
+    }
+
+    .modal-footer {
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .modal-footer button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .modal-header {
+      padding: 1rem 1.5rem;
+    }
+
+    .modal-content {
+      padding: 1rem;
+    }
+
+    .section-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+
+    .toggle-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .toggle-info {
+      width: 100%;
+    }
+  }
+</style> 

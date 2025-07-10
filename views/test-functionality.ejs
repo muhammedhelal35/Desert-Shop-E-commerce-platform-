@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DesertShop - Functionality Test</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .test-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    .test-header {
+      background: linear-gradient(135deg, #4361EE, #3a0ca3);
+      color: white;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .test-header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .test-content {
+      padding: 2rem;
+    }
+
+    .test-section {
+      margin-bottom: 3rem;
+      padding: 2rem;
+      border: 2px solid #e9ecef;
+      border-radius: 15px;
+      background: #f8f9fa;
+    }
+
+    .test-section h2 {
+      color: #2c3e50;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .test-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .test-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e9ecef;
+      transition: all 0.3s ease;
+    }
+
+    .test-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .test-card h3 {
+      color: #4361EE;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .test-card p {
+      color: #6c757d;
+      margin-bottom: 1rem;
+      line-height: 1.6;
+    }
+
+    .test-btn {
+      display: inline-block;
+      padding: 0.8rem 1.5rem;
+      background: linear-gradient(135deg, #4361EE, #3a0ca3);
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .test-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+    }
+
+    .test-btn.secondary {
+      background: #6c757d;
+    }
+
+    .test-btn.secondary:hover {
+      background: #5a6268;
+    }
+
+    .status-indicator {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: 0.5rem;
+    }
+
+    .status-working {
+      background: #28a745;
+    }
+
+    .status-pending {
+      background: #ffc107;
+    }
+
+    .feature-list {
+      list-style: none;
+      margin-top: 1rem;
+    }
+
+    .feature-list li {
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #e9ecef;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .feature-list li:last-child {
+      border-bottom: none;
+    }
+
+    .feature-list i {
+      color: #28a745;
+      width: 20px;
+    }
+
+    .test-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .test-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .test-actions {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="test-container">
+    <div class="test-header">
+      <h1>🧪 DesertShop Functionality Test</h1>
+      <p>Verify all implemented features are working correctly</p>
+    </div>
+
+    <div class="test-content">
+      <!-- Cart Functionality -->
+      <div class="test-section">
+        <h2><i class="fas fa-shopping-cart"></i> Cart Functionality</h2>
+        <div class="test-grid">
+          <div class="test-card">
+            <h3><span class="status-indicator status-working"></span>Add to Cart</h3>
+            <p>Products can be added to cart with quantity selection and stock validation.</p>
+            <div class="feature-list">
+              <li><i class="fas fa-check"></i>Quantity controls with +/- buttons</li>
+              <li><i class="fas fa-check"></i>Stock validation</li>
+              <li><i class="fas fa-check"></i>Real-time cart count updates</li>
+              <li><i class="fas fa-check"></i>AJAX cart updates</li>
+            </div>
+            <div class="test-actions">
+              <a href="/products" class="test-btn">Test Add to Cart</a>
+              <a href="/cart" class="test-btn secondary">View Cart</a>
+            </div>
+          </div>
+
+          <div class="test-card">
+            <h3><span class="status-indicator status-working"></span>Remove from Cart</h3>
+            <p>Items can be removed from cart with smooth animations and confirmation.</p>
+            <div class="feature-list">
+              <li><i class="fas fa-check"></i>Individual item removal</li>
+              <li><i class="fas fa-check"></i>Clear entire cart</li>
+              <li><i class="fas fa-check"></i>Confirmation dialogs</li>
+              <li><i class="fas fa-check"></i>Smooth animations</li>
+            </div>
+            <div class="test-actions">
+              <a href="/cart" class="test-btn">Test Remove Items</a>
+            </div>
+          </div>
+
+          <div class="test-card">
+            <h3><span class="status-indicator status-working"></span>Cart Updates</h3>
+            <p>Quantity updates with real-time price calculations and validation.</p>
+            <div class="feature-list">
+              <li><i class="fas fa-check"></i>Real-time quantity updates</li>
+              <li><i class="fas fa-check"></i>Price recalculation</li>
+              <li><i class="fas fa-check"></i>Stock limit validation</li>
+              <li><i class="fas fa-check"></i>Error handling</li>
+            </div>
+            <div class="test-actions">
+              <a href="/cart" class="test-btn">Test Quantity Updates</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Wishlist Functionality -->
+      <div class="test-section">
+        <h2><i class="fas fa-heart"></i> Wishlist Functionality</h2>
+        <div class="test-grid">
+          <div class="test-card">
+            <h3><span class="status-indicator status-working"></span>Add to Wishlist</h3>
+            <p>Products can be added to wishlist from product pages and cart.</p>
+            <div class="feature-list">
+              <li><i class="fas fa-check"></i>Heart icon toggle</li>
+              <li><i class="fas fa-check"></i>AJAX wishlist updates</li>
+              <li><i class="fas fa-check"></i>Visual feedback</li>
+              <li><i class="fas fa-check"></i>Duplicate prevention</li>
+            </div>
+            <div class="test-actions">
+              <a href="/products" class="test-btn">Test Add to Wishlist</a>
+              <a href="/wishlist/page" class="test-btn secondary">View Wishlist</a>
+            </div>
+          </div>
+
+          <div class="test-card">
+            <h3><span class="status-indicator status-working"></span>Wishlist Management</h3>
+            <p>Comprehensive wishlist page with product management features.</p>
+            <div class="feature-list">
+              <li><i class="fas fa-check"></i>Dedicated wishlist page</li>
+              <li><i class="fas fa-check"></i>Add all to cart</li>
+              <li><i class="fas fa-check"></i>Remove individual items</li>
+              <li><i class="fas fa-check"></i>Clear entire wishlist</li>
+            </div>
+            <div class="test-actions">
+              <a href="/wishlist/page" class="test-btn">Test Wishlist Page</a>
+            </div>
+          </div>
+
+          <div class="test-card">
+            <h3><span class="status-indicator status-working"></span>Wishlist Integration</h3>
+            <p>Wishlist status is maintained across all pages and sessions.</p>
+            <div class="feature-list">
+              <li><i class="fas fa-check"></i>Cross-page wishlist status</li>
+              <li><i class="fas fa-check"></i>Session persistence</li>
+              <li><i class="fas fa-check"></i>User-specific wishlists</li>
+              <li><i class="fas fa-check"></i>Database storage</li>
+            </div>
+            <div class="test-actions">
+              <a href="/products" class="test-btn">Test Integration</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Functionality -->
+      <div class="test-section">
+        <h2><i class="fas fa-credit-card"></i> Payment Functionality</h2>
+        <div class="test-grid">
+          <div class="test-card">
+            <h3><span class="status-indicator status-working"></span>Checkout Process</h3>
+            <p>Comprehensive checkout with multiple payment options and validation.</p>
+            <div class="feature-list">
+              <li><i class="fas fa-check"></i>Multiple payment methods</li>
+              <li><i class="fas fa-check"></i>Form validation</li>
+              <li><i class="fas fa-check"></i>Credit card validation</li>
+              <li><i class="fas fa-check"></i>Order summary</li>
+            </div>
+            <div class="test-actions">
+              <a href="/cart" class="test-btn">Add Items to Cart</a>
+              <a href="/orders/checkout" class="test-btn secondary">Test Checkout</a>
+            </div>
+          </div>
+
+          <div class="test-card">
+            <h3><span class="status-indicator status-working"></span>Payment Methods</h3>
+            <p>Support for credit card, PayPal, and cash on delivery payments.</p>
+            <div class="feature-list">
+              <li><i class="fas fa-check"></i>Credit/Debit Card</li>
+              <li><i class="fas fa-check"></i>PayPal integration</li>
+              <li><i class="fas fa-check"></i>Cash on Delivery</li>
+              <li><i class="fas fa-check"></i>Payment validation</li>
+            </div>
+            <div class="test-actions">
+              <a href="/orders/checkout" class="test-btn">Test Payment Methods</a>
+            </div>
+          </div>
+
+          <div class="test-card">
+            <h3><span class="status-indicator status-working"></span>Order Processing</h3>
+            <p>Complete order processing with email confirmation and status tracking.</p>
+            <div class="feature-list">
+              <li><i class="fas fa-check"></i>Order creation</li>
+              <li><i class="fas fa-check"></i>Email confirmation</li>
+              <li><i class="fas fa-check"></i>Stock updates</li>
+              <li><i class="fas fa-check"></i>Order tracking</li>
+            </div>
+            <div class="test-actions">
+              <a href="/orders" class="test-btn">View Orders</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile Settings -->
+      <div class="test-section">
+        <h2><i class="fas fa-user-cog"></i> Profile Settings</h2>
+        <div class="test-grid">
+          <div class="test-card">
+            <h3><span class="status-indicator status-working"></span>Settings Modal</h3>
+            <p>Modern settings modal accessible from the navbar with comprehensive options.</p>
+            <div class="feature-list">
+              <li><i class="fas fa-check"></i>Profile picture upload</li>
+              <li><i class="fas fa-check"></i>Basic information</li>
+              <li><i class="fas fa-check"></i>Privacy settings</li>
+              <li><i class="fas fa-check"></i>Account preferences</li>
+            </div>
+            <div class="test-actions">
+              <button onclick="openSettingsModal()" class="test-btn">Open Settings</button>
+            </div>
+          </div>
+
+          <div class="test-card">
+            <h3><span class="status-indicator status-working"></span>Avatar Management</h3>
+            <p>Profile picture upload with preview and navbar integration.</p>
+            <div class="feature-list">
+              <li><i class="fas fa-check"></i>Image upload preview</li>
+              <li><i class="fas fa-check"></i>Navbar avatar display</li>
+              <li><i class="fas fa-check"></i>Default avatar fallback</li>
+              <li><i class="fas fa-check"></i>Real-time updates</li>
+            </div>
+            <div class="test-actions">
+              <button onclick="openSettingsModal()" class="test-btn">Test Avatar</button>
+            </div>
+          </div>
+
+          <div class="test-card">
+            <h3><span class="status-indicator status-working"></span>Settings Persistence</h3>
+            <p>All settings are saved to database and persist across sessions.</p>
+            <div class="feature-list">
+              <li><i class="fas fa-check"></i>Database storage</li>
+              <li><i class="fas fa-check"></i>Session persistence</li>
+              <li><i class="fas fa-check"></i>AJAX updates</li>
+              <li><i class="fas fa-check"></i>Error handling</li>
+            </div>
+            <div class="test-actions">
+              <button onclick="openSettingsModal()" class="test-btn">Test Settings</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <div class="test-section">
+        <h2><i class="fas fa-bars"></i> Navigation & UI</h2>
+        <div class="test-grid">
+          <div class="test-card">
+            <h3><span class="status-indicator status-working"></span>Responsive Design</h3>
+            <p>Modern, responsive design that works on all devices.</p>
+            <div class="feature-list">
+              <li><i class="fas fa-check"></i>Mobile responsive</li>
+              <li><i class="fas fa-check"></i>Modern UI design</li>
+              <li><i class="fas fa-check"></i>Smooth animations</li>
+              <li><i class="fas fa-check"></i>Accessibility features</li>
+            </div>
+            <div class="test-actions">
+              <a href="/" class="test-btn">View Homepage</a>
+            </div>
+          </div>
+
+          <div class="test-card">
+            <h3><span class="status-indicator status-working"></span>User Experience</h3>
+            <p>Intuitive user experience with smooth interactions and feedback.</p>
+            <div class="feature-list">
+              <li><i class="fas fa-check"></i>Loading states</li>
+              <li><i class="fas fa-check"></i>Success notifications</li>
+              <li><i class="fas fa-check"></i>Error handling</li>
+              <li><i class="fas fa-check"></i>Confirmation dialogs</li>
+            </div>
+            <div class="test-actions">
+              <a href="/products" class="test-btn">Test UX</a>
+            </div>
+          </div>
+
+          <div class="test-card">
+            <h3><span class="status-indicator status-working"></span>Performance</h3>
+            <p>Optimized performance with efficient loading and caching.</p>
+            <div class="feature-list">
+              <li><i class="fas fa-check"></i>Fast loading</li>
+              <li><i class="fas fa-check"></i>AJAX requests</li>
+              <li><i class="fas fa-check"></i>Optimized images</li>
+              <li><i class="fas fa-check"></i>Efficient queries</li>
+            </div>
+            <div class="test-actions">
+              <a href="/" class="test-btn">Test Performance</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Function to open settings modal (if available)
+    function openSettingsModal() {
+      if (typeof window.openSettingsModal === 'function') {
+        window.openSettingsModal();
+      } else {
+        alert('Settings modal is available when logged in. Please log in to test this feature.');
+      }
+    }
+
+    // Add some interactive elements
+    document.addEventListener('DOMContentLoaded', function() {
+      // Add hover effects to test cards
+      const testCards = document.querySelectorAll('.test-card');
+      testCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+          this.style.transform = 'translateY(-5px)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+          this.style.transform = 'translateY(0)';
+        });
+      });
+
+      // Add click effects to buttons
+      const testBtns = document.querySelectorAll('.test-btn');
+      testBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+          this.style.transform = 'scale(0.95)';
+          setTimeout(() => {
+            this.style.transform = 'scale(1)';
+          }, 150);
+        });
+      });
+    });
+  </script>
+</body>
+</html> 

@@ -1,0 +1,40 @@
+<div class="payment-container card fade-in premium-payment">
+  <h1>Payment</h1>
+  <form id="paymentForm">
+    <div class="form-group">
+      <label>Choose Payment Method:</label>
+      <select id="paymentType" class="form-control">
+        <option value="credit_card">Credit Card (Stripe)</option>
+        <option value="cash">Cash on Delivery</option>
+      </select>
+    </div>
+    <div id="stripeSection" style="display:block;">
+      <button type="button" id="payWithStripe" class="btn-main w-100 mt-2">Pay with Credit Card</button>
+    </div>
+    <div id="cashSection" style="display:none;">
+      <button type="button" id="confirmCash" class="btn-secondary w-100 mt-2">Confirm Cash Payment</button>
+    </div>
+  </form>
+</div>
+<script>
+const paymentType = document.getElementById('paymentType');
+const stripeSection = document.getElementById('stripeSection');
+const cashSection = document.getElementById('cashSection');
+paymentType.addEventListener('change', function() {
+  if (this.value === 'credit_card') {
+    stripeSection.style.display = 'block';
+    cashSection.style.display = 'none';
+  } else {
+    stripeSection.style.display = 'none';
+    cashSection.style.display = 'block';
+  }
+});
+document.getElementById('payWithStripe').onclick = function() {
+  // Redirect to backend to create Stripe session
+  window.location.href = '/orders/create-stripe-session';
+};
+document.getElementById('confirmCash').onclick = function() {
+  // Redirect to backend to confirm cash order
+  window.location.href = '/orders/confirm-cash';
+};
+</script> 

@@ -1,0 +1,97 @@
+<div class="auth-bg-gradient"></div>
+<div class="auth-container fade-in d-flex align-center justify-center">
+  <div class="auth-illustration d-none d-md-flex align-center justify-center">
+    <img src="/images/login-banner.jpg" alt="Welcome to our platform" class="auth-banner rounded shadow mb-2">
+  </div>
+  <div class="auth-card card fade-in small-card">
+    <div class="auth-header text-center">
+      <h1 class="auth-title mb-2">Welcome Back</h1>
+    </div>
+    <form action="/auth/login" method="POST" class="auth-form fade-in" autocomplete="on">
+      <div class="form-group mb-2">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email" class="form-control" value="<%= typeof formData !== 'undefined' && formData.email ? formData.email : '' %>" required autocomplete="email" autofocus>
+      </div>
+      <div class="form-group mb-2">
+        <label for="password">Password</label>
+        <div class="password-input">
+          <input type="password" id="password" name="password" class="form-control" required autocomplete="current-password">
+          <button type="button" class="toggle-password" aria-label="Show password"><i class="fas fa-eye"></i></button>
+        </div>
+      </div>
+      <div class="form-options form-row mb-2">
+        <div class="form-check toggle-switch">
+          <input type="checkbox" id="remember" name="remember" class="form-check-input">
+          <label for="remember" class="form-check-label">Remember me</label>
+        </div>
+        <a href="/auth/forgot" class="forgot-password">Forgot password?</a>
+      </div>
+      <button type="submit" class="btn btn-primary w-100 mt-2"><i class="fas fa-sign-in-alt"></i> Sign In</button>
+    </form>
+    <div class="auth-divider fade-in"><span>or continue with</span></div>
+    <div class="social-auth fade-in d-flex gap-2 justify-center">
+      <a href="/auth/google" class="btn btn-secondary btn-social" aria-label="Sign in with Google"><i class="fab fa-google"></i> Google</a>
+      <a href="/auth/facebook" class="btn btn-secondary btn-social" aria-label="Sign in with Facebook"><i class="fab fa-facebook-f"></i> Facebook</a>
+    </div>
+    <div class="auth-footer fade-in text-center mt-2">
+      Don't have an account? <a href="/auth/register">Sign up</a>
+    </div>
+  </div>
+</div>
+<style>
+.auth-bg-gradient {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  z-index: 0;
+  background: linear-gradient(120deg, var(--primary-light) 0%, #f8e1f4 100%);
+  opacity: 0.7;
+}
+.auth-container {
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2.5rem;
+}
+.auth-illustration img { box-shadow: 0 8px 32px rgba(37,99,235,0.13); border-radius: 22px; max-width:340px; width:100%; object-fit:cover; }
+.auth-card { box-shadow: 0 8px 32px rgba(37,99,235,0.13); border-radius: 22px; background: rgba(255,255,255,0.97); padding: 2.5rem 2rem; }
+.auth-form .form-group { margin-bottom: 1.5rem; }
+.form-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.btn-primary, .btn-secondary, .btn-social { font-size: 1.15rem; padding: 1rem 0; border-radius: 22px; min-height: 48px; font-weight: 700; }
+.btn-primary { background: linear-gradient(90deg, var(--primary) 60%, var(--accent) 100%); color: #fff; border: none; }
+.btn-primary:hover { background: linear-gradient(90deg, var(--accent) 0%, var(--primary-dark) 100%); }
+.btn-secondary, .btn-social { background: var(--primary-light); color: var(--primary-dark); border: none; margin: 0 0.25rem; }
+.btn-secondary:hover, .btn-social:hover { background: var(--accent-light); color: var(--primary-dark); }
+.auth-divider { margin: 2rem 0 1.5rem 0; text-align: center; position: relative; }
+.auth-divider span { background: #fff; padding: 0 1.2rem; color: var(--muted); position: relative; z-index: 1; }
+.auth-divider:before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: var(--border); z-index: 0; }
+.social-auth { display: flex; justify-content: center; gap: 1rem; margin-bottom: 1.5rem; }
+.auth-footer { margin-top: 2rem; }
+@media (max-width: 900px) {
+  .auth-container { flex-direction: column; gap: 0; }
+  .auth-illustration { display: none !important; }
+  .auth-card { margin: 2rem auto; }
+}
+@media (max-width: 600px) {
+  .auth-card { padding: 1.2rem 0.5rem; }
+  .auth-form .form-group { margin-bottom: 1rem; }
+  .btn-primary, .btn-secondary, .btn-social { font-size: 1rem; min-height: 42px; }
+}
+</style>
+<script src="/js/main.js"></script>
+<script>
+document.querySelector('.toggle-password')?.addEventListener('click', function() {
+  const passwordInput = document.getElementById('password');
+  const icon = this.querySelector('i');
+  if (passwordInput.type === 'password') {
+    passwordInput.type = 'text';
+    icon.classList.replace('fa-eye', 'fa-eye-slash');
+  } else {
+    passwordInput.type = 'password';
+    icon.classList.replace('fa-eye-slash', 'fa-eye');
+  }
+});
+</script>
+<!-- All auth styles are now in style.css -->

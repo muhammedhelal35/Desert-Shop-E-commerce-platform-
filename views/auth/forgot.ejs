@@ -1,0 +1,40 @@
+<div class="auth-container fade-in">
+  <div class="auth-card card fade-in">
+    <div class="auth-header">
+      <h1 class="auth-title mb-2">Forgot Password</h1>
+      <% if (success_msg && success_msg.length > 0) { %>
+        <div class="alert-success card fade-in mb-2"><%= success_msg %></div>
+      <% } %>
+      <% if (error_msg && error_msg.length > 0) { %>
+        <div class="alert-danger card fade-in mb-2"><%= error_msg %></div>
+      <% } %>
+    </div>
+    <form method="POST" action="/auth/forgot" class="auth-form fade-in">
+      <div class="form-group mb-2">
+        <label for="email">Email Address</label>
+        <input type="email" class="form-control" id="email" name="email" required>
+      </div>
+      <button type="submit" class="btn-main w-100 mt-2">Send Reset Link</button>
+    </form>
+    <div class="auth-footer fade-in mt-2">
+      <a href="/auth/login">Back to Login</a>
+    </div>
+  </div>
+</div>
+<style>
+.auth-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 2rem; background: var(--primary-light); }
+.auth-card { width: 100%; max-width: 420px; background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; padding: 2rem 1.5rem; }
+.auth-header { text-align: center; margin-bottom: 1.5rem; }
+.auth-title { font-size: 2rem; font-weight: 800; color: var(--primary-dark); margin-bottom: 1rem; }
+.auth-form { margin-bottom: 1.5rem; }
+.form-group label { font-weight: 600; color: var(--primary-dark); margin-bottom: 0.5rem; display: block; }
+.form-control { width: 100%; padding: 1rem 1.2rem; border-radius: var(--radius); border: 1.5px solid var(--border); background: #fff; font-size: 1rem; margin-bottom: 0.7rem; transition: border var(--transition), box-shadow var(--transition); }
+.form-control:focus { outline: none; border: 2px solid var(--primary); box-shadow: 0 2px 8px rgba(231, 184, 201, 0.10); }
+.btn-main.w-100 { width: 100%; margin-top: 1.5rem; }
+.auth-footer { text-align: center; color: var(--muted); font-size: 1rem; margin-top: 1rem; }
+.auth-footer a { color: var(--primary); text-decoration: none; font-weight: 600; }
+.auth-footer a:hover { text-decoration: underline; }
+.alert-success { background: var(--accent-light); color: var(--primary-dark); padding: 1rem; border-radius: var(--radius); margin-bottom: 1.2rem; text-align: center; }
+.alert-danger { background: #fee2e2; color: #b91c1c; padding: 1rem; border-radius: var(--radius); margin-bottom: 1.2rem; text-align: center; }
+@media (max-width: 700px) { .auth-card { max-width: 98vw; padding: 1.2rem 0.5rem; } .auth-title { font-size: 1.5rem; } }
+</style> 

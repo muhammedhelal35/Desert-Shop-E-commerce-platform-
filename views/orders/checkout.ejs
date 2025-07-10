@@ -1,0 +1,651 @@
+<%- include('../partials/_flash') %>
+
+<div class="checkout-container fade-in">
+  <div class="checkout-header card fade-in">
+    <h1>🛒 Secure Checkout</h1>
+    <p>Complete your order with confidence</p>
+  </div>
+  
+  <div class="checkout-content">
+    <form class="checkout-form card fade-in" id="checkoutForm" action="/orders/checkout" method="POST">
+      <!-- Shipping Information -->
+      <div class="form-section">
+        <h3><i class="fas fa-shipping-fast"></i> Shipping Information</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="name">Full Name *</label>
+            <input type="text" id="name" name="name" class="form-control" value="<%= user.name %>" required>
+          </div>
+          <div class="form-group">
+            <label for="email">Email *</label>
+            <input type="email" id="email" name="email" class="form-control" value="<%= user.email %>" required>
+          </div>
+          <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" name="phone" class="form-control" value="<%= user.phone || '' %>">
+          </div>
+          <div class="form-group full-width">
+            <label for="address">Shipping Address *</label>
+            <textarea id="address" name="shippingAddress" class="form-control" rows="3" required><%= user.address || '' %></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Method -->
+      <div class="form-section">
+        <h3><i class="fas fa-credit-card"></i> Payment Method</h3>
+        <div class="payment-methods">
+          <label class="payment-method" data-method="credit_card">
+            <input type="radio" name="paymentMethod" value="credit_card" checked>
+            <div class="payment-method-content">
+              <i class="fas fa-credit-card"></i>
+              <div class="payment-method-info">
+                <span class="payment-method-name">Credit/Debit Card</span>
+                <span class="payment-method-desc">Secure payment with Stripe</span>
+              </div>
+            </div>
+          </label>
+          
+          <label class="payment-method" data-method="paypal">
+            <input type="radio" name="paymentMethod" value="paypal">
+            <div class="payment-method-content">
+              <i class="fab fa-paypal"></i>
+              <div class="payment-method-info">
+                <span class="payment-method-name">PayPal</span>
+                <span class="payment-method-desc">Pay with your PayPal account</span>
+              </div>
+            </div>
+          </label>
+          
+          <label class="payment-method" data-method="cash_on_delivery">
+            <input type="radio" name="paymentMethod" value="cash_on_delivery">
+            <div class="payment-method-content">
+              <i class="fas fa-money-bill-wave"></i>
+              <div class="payment-method-info">
+                <span class="payment-method-name">Cash on Delivery</span>
+                <span class="payment-method-desc">Pay when you receive your order</span>
+              </div>
+            </div>
+          </label>
+        </div>
+
+        <!-- Credit Card Details (shown when credit card is selected) -->
+        <div id="creditCardDetails" class="credit-card-details">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="cardNumber">Card Number *</label>
+              <input type="text" id="cardNumber" name="cardNumber" class="form-control" placeholder="1234 5678 9012 3456" maxlength="19">
+            </div>
+            <div class="form-group">
+              <label for="cardholderName">Cardholder Name *</label>
+              <input type="text" id="cardholderName" name="cardholderName" class="form-control" placeholder="Enter your name">
+            </div>
+            <div class="form-group">
+              <label for="expiryDate">Expiry Date *</label>
+              <input type="text" id="expiryDate" name="expiryDate" class="form-control" placeholder="MM/YY" maxlength="5">
+            </div>
+            <div class="form-group">
+              <label for="cvv">CVV *</label>
+              <input type="text" id="cvv" name="cvv" class="form-control" placeholder="123" maxlength="4">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Notes -->
+      <div class="form-section">
+        <h3><i class="fas fa-sticky-note"></i> Order Notes (Optional)</h3>
+        <div class="form-group">
+          <textarea id="orderNotes" name="orderNotes" class="form-control" rows="3" placeholder="Any special instructions for your order..."></textarea>
+        </div>
+      </div>
+
+      <!-- Terms and Conditions -->
+      <div class="form-section">
+        <label class="checkbox-label">
+          <input type="checkbox" id="termsAccepted" name="termsAccepted" required>
+          <span class="checkmark"></span>
+          I agree to the <a href="/terms" target="_blank">Terms and Conditions</a> and <a href="/privacy" target="_blank">Privacy Policy</a> *
+        </label>
+      </div>
+
+      <button type="submit" class="btn-main checkout-btn" id="placeOrderBtn">
+        <i class="fas fa-lock"></i>
+        <span>Place Order - $<%= total.toFixed(2) %></span>
+      </button>
+    </form>
+
+    <!-- Order Summary -->
+    <div class="order-summary card fade-in">
+      <h3><i class="fas fa-receipt"></i> Order Summary</h3>
+      <div class="summary-items">
+        <% cart.items.forEach(item => { %>
+          <div class="summary-item">
+            <div class="item-info">
+              <img src="<%= item.product.image %>" alt="<%= item.product.name %>" class="item-image">
+              <div class="item-details">
+                <h5><%= item.product.name %></h5>
+                <span class="item-quantity">Qty: <%= item.quantity %></span>
+              </div>
+            </div>
+            <span class="item-price">$<%= (item.price * item.quantity).toFixed(2) %></span>
+          </div>
+        <% }); %>
+      </div>
+      
+      <div class="summary-totals">
+        <div class="summary-row">
+          <span>Subtotal</span>
+          <span>$<%= subtotal.toFixed(2) %></span>
+        </div>
+        <div class="summary-row">
+          <span>Tax (10%)</span>
+          <span>$<%= tax.toFixed(2) %></span>
+        </div>
+        <div class="summary-row">
+          <span>Shipping</span>
+          <span>$<%= shipping.toFixed(2) %></span>
+        </div>
+        <div class="summary-row total">
+          <span>Total</span>
+          <span>$<%= total.toFixed(2) %></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% if (typeof paymentStatus !== 'undefined') { %>
+  <div class="alert alert-success fade-in mt-2">
+    <i class="fas fa-check-circle"></i> Payment <%= paymentStatus %>! Thank you for your order.
+  </div>
+<% } %>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('checkoutForm');
+  const paymentMethods = document.querySelectorAll('.payment-method');
+  const creditCardDetails = document.getElementById('creditCardDetails');
+  const placeOrderBtn = document.getElementById('placeOrderBtn');
+  
+  // Payment method selection
+  paymentMethods.forEach(method => {
+    method.addEventListener('click', function() {
+      const methodType = this.getAttribute('data-method');
+      
+      // Show/hide credit card details
+      if (methodType === 'credit_card') {
+        creditCardDetails.style.display = 'block';
+      } else {
+        creditCardDetails.style.display = 'none';
+      }
+      
+      // Update button text
+      updateButtonText(methodType);
+    });
+  });
+  
+  // Card number formatting
+  const cardNumber = document.getElementById('cardNumber');
+  cardNumber.addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\s/g, '');
+    value = value.replace(/\D/g, '');
+    value = value.replace(/(\d{4})/g, '$1 ').trim();
+    e.target.value = value;
+  });
+  
+  // Expiry date formatting
+  const expiryDate = document.getElementById('expiryDate');
+  expiryDate.addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length >= 2) {
+      value = value.slice(0, 2) + '/' + value.slice(2, 4);
+    }
+    e.target.value = value;
+  });
+  
+  // CVV formatting
+  const cvv = document.getElementById('cvv');
+  cvv.addEventListener('input', function(e) {
+    e.target.value = e.target.value.replace(/\D/g, '');
+  });
+  
+  // Form validation and submission
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+    
+    // Show loading state
+    placeOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+    placeOrderBtn.disabled = true;
+    
+    // Submit form
+    form.submit();
+  });
+  
+  function validateForm() {
+    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+    
+    // Basic validation
+    const requiredFields = ['name', 'email', 'shippingAddress'];
+    for (let field of requiredFields) {
+      const input = document.getElementById(field);
+      if (!input.value.trim()) {
+        showNotification(`Please fill in ${field.replace(/([A-Z])/g, ' $1').toLowerCase()}`, 'error');
+        input.focus();
+        return false;
+      }
+    }
+    
+    // Email validation
+    const email = document.getElementById('email').value;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showNotification('Please enter a valid email address', 'error');
+      return false;
+    }
+    
+    // Credit card validation
+    if (paymentMethod === 'credit_card') {
+      const cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
+      const cardholderName = document.getElementById('cardholderName').value;
+      const expiryDate = document.getElementById('expiryDate').value;
+      const cvv = document.getElementById('cvv').value;
+      
+      if (!cardNumber || cardNumber.length < 13) {
+        showNotification('Please enter a valid card number', 'error');
+        return false;
+      }
+      
+      if (!cardholderName.trim()) {
+        showNotification('Please enter cardholder name', 'error');
+        return false;
+      }
+      
+      if (!expiryDate || !/^\d{2}\/\d{2}$/.test(expiryDate)) {
+        showNotification('Please enter a valid expiry date (MM/YY)', 'error');
+        return false;
+      }
+      
+      if (!cvv || cvv.length < 3) {
+        showNotification('Please enter a valid CVV', 'error');
+        return false;
+      }
+    }
+    
+    // Terms acceptance
+    if (!document.getElementById('termsAccepted').checked) {
+      showNotification('Please accept the terms and conditions', 'error');
+      return false;
+    }
+    
+    return true;
+  }
+  
+  function updateButtonText(methodType) {
+    const total = '<%= total.toFixed(2) %>';
+    let methodText = '';
+    
+    switch(methodType) {
+      case 'credit_card':
+        methodText = 'Pay with Card';
+        break;
+      case 'paypal':
+        methodText = 'Pay with PayPal';
+        break;
+      case 'cash_on_delivery':
+        methodText = 'Pay on Delivery';
+        break;
+    }
+    
+    placeOrderBtn.innerHTML = `<i class="fas fa-lock"></i><span>${methodText} - $${total}</span>`;
+  }
+  
+  function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+      <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+      <span>${message}</span>
+    `;
+    
+    const bgColor = type === 'success' ? '#a8e6cf' : type === 'error' ? '#e74c3c' : '#4361EE';
+    
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: ${bgColor};
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      z-index: 10001;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      font-weight: 500;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Animate in
+    setTimeout(() => {
+      notification.style.transform = 'translateX(0)';
+    }, 10);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+      notification.style.transform = 'translateX(100%)';
+      setTimeout(() => {
+        notification.remove();
+      }, 300);
+    }, 3000);
+  }
+});
+</script>
+
+<style>
+.checkout-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.checkout-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  background: linear-gradient(135deg, #4361EE, #3a0ca3);
+  color: white;
+  padding: 2rem;
+  border-radius: 15px;
+}
+
+.checkout-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+}
+
+.checkout-header p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.checkout-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+}
+
+.checkout-form {
+  background: white;
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.form-section {
+  margin-bottom: 2rem;
+}
+
+.form-section h3 {
+  color: #2c3e50;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #495057;
+  font-weight: 500;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #4361EE;
+  box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+}
+
+.payment-methods {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.payment-method {
+  display: block;
+  cursor: pointer;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  padding: 1rem;
+  transition: all 0.3s ease;
+}
+
+.payment-method:hover {
+  border-color: #4361EE;
+  background: #f8f9ff;
+}
+
+.payment-method input[type="radio"] {
+  display: none;
+}
+
+.payment-method input[type="radio"]:checked + .payment-method-content {
+  color: #4361EE;
+}
+
+.payment-method input[type="radio"]:checked ~ .payment-method {
+  border-color: #4361EE;
+  background: #f8f9ff;
+}
+
+.payment-method-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.payment-method-content i {
+  font-size: 1.5rem;
+  width: 40px;
+  text-align: center;
+}
+
+.payment-method-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.payment-method-name {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.payment-method-desc {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.credit-card-details {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #495057;
+}
+
+.checkbox-label input[type="checkbox"] {
+  margin-top: 0.2rem;
+}
+
+.checkbox-label a {
+  color: #4361EE;
+  text-decoration: none;
+}
+
+.checkbox-label a:hover {
+  text-decoration: underline;
+}
+
+.checkout-btn {
+  width: 100%;
+  padding: 1.2rem;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #4361EE, #3a0ca3);
+  color: white;
+  font-weight: 600;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.checkout-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(67, 97, 238, 0.3);
+}
+
+.checkout-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.order-summary {
+  background: white;
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  height: fit-content;
+  position: sticky;
+  top: 2rem;
+}
+
+.order-summary h3 {
+  color: #2c3e50;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.summary-items {
+  margin-bottom: 1.5rem;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.item-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+}
+
+.item-image {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.item-details h5 {
+  margin: 0 0 0.2rem 0;
+  font-size: 0.9rem;
+  color: #2c3e50;
+}
+
+.item-quantity {
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+.item-price {
+  font-weight: 600;
+  color: #4361EE;
+}
+
+.summary-totals {
+  border-top: 2px solid #e9ecef;
+  padding-top: 1rem;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+}
+
+.summary-row.total {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #4361EE;
+  border-top: 1px solid #e9ecef;
+  padding-top: 1rem;
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .checkout-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .payment-methods {
+    gap: 0.5rem;
+  }
+}
+</style> 

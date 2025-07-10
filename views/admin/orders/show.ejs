@@ -1,0 +1,226 @@
+<%- include('../../partials/_admin-navbar') %>
+<main class="admin-container fade-in">
+  <header class="admin-header">
+    <h1><i class="fas fa-receipt"></i> Order Details</h1>
+    <p>Review and update order status</p>
+  </header>
+  <% if (success_msg) { %>
+    <div class="alert alert-success fade-in"><i class="fas fa-check-circle"></i> <%= success_msg %></div>
+  <% } %>
+  <% if (error_msg) { %>
+    <div class="alert alert-danger fade-in"><i class="fas fa-exclamation-circle"></i> <%= error_msg %></div>
+  <% } %>
+  <section class="order-details-grid">
+    <div class="order-info-card data-card fade-in">
+      <h4><i class="fas fa-info-circle"></i> Order Info</h4>
+      <p><strong>Order ID:</strong> <%= order._id %></p>
+      <p><strong>Status:</strong> <span class="status-badge status-<%= order.status.toLowerCase() %>"><i class="fas fa-circle"></i> <%= order.status.charAt(0).toUpperCase() + order.status.slice(1) %></span></p>
+      <p><strong>Payment Status:</strong> <span class="status-badge status-<%= order.paymentStatus.toLowerCase() %>"><i class="fas fa-circle"></i> <%= order.paymentStatus.charAt(0).toUpperCase() + order.paymentStatus.slice(1) %></span></p>
+      <p><strong>Date:</strong> <%= new Date(order.createdAt).toLocaleString() %></p>
+      <p><strong>Payment Method:</strong> <%= order.paymentMethod.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) %></p>
+      <form action="/admin/orders/<%= order._id %>/status" method="POST" class="order-status-form">
+        <label for="status" class="form-label">Update Status</label>
+        <div class="input-group">
+          <select name="status" id="status" class="form-control">
+            <option value="pending" <%= order.status === 'pending' ? 'selected' : '' %>>Pending</option>
+            <option value="processing" <%= order.status === 'processing' ? 'selected' : '' %>>Processing</option>
+            <option value="shipped" <%= order.status === 'shipped' ? 'selected' : '' %>>Shipped</option>
+            <option value="delivered" <%= order.status === 'delivered' ? 'selected' : '' %>>Delivered</option>
+            <option value="cancelled" <%= order.status === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
+          </select>
+          <button type="submit" class="btn btn-primary" aria-label="Update Status">
+            <i class="fas fa-sync-alt"></i> Update Status
+          </button>
+        </div>
+      </form>
+    </div>
+    <div class="customer-info-card data-card fade-in">
+      <h4><i class="fas fa-user"></i> Customer Info</h4>
+      <p><strong>Name:</strong> <%= order.customerName || (order.user ? order.user.name : 'Guest') %></p>
+      <p><strong>Email:</strong> <%= order.customerEmail || (order.user ? order.user.email : '-') %></p>
+      <p><strong>Phone:</strong> <%= order.customerPhone || (order.user ? order.user.phone : '-') %></p>
+      <p><strong>Address:</strong> <%= order.shippingAddress %></p>
+      <% if (order.orderNotes) { %>
+        <p><strong>Order Notes:</strong> <%= order.orderNotes %></p>
+      <% } %>
+    </div>
+  </section>
+  <section class="order-items-section fade-in">
+    <h4><i class="fas fa-box"></i> Order Items</h4>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Image</th>
+          <th>Price</th>
+          <th>Quantity</th>
+          <th>Subtotal</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% order.items.forEach(item => { %>
+          <tr>
+            <td><%= item.product ? item.product.name : 'Product' %></td>
+            <td><img src="<%= item.product && item.product.image ? item.product.image : '/images/placeholder.jpg' %>" style="height:40px;width:40px;object-fit:cover;border-radius:8px;box-shadow:0 2px 8px rgba(120,120,180,0.08);" alt="Product image"></td>
+            <td>$<%= item.price ? item.price.toFixed(2) : '0.00' %></td>
+            <td><%= item.quantity %></td>
+            <td>$<%= (item.price * item.quantity).toFixed(2) %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+    <div class="order-summary">
+      <div class="summary-row">
+        <span>Subtotal:</span>
+        <span>$<%= order.subtotal.toFixed(2) %></span>
+      </div>
+      <div class="summary-row">
+        <span>Tax (10%):</span>
+        <span>$<%= order.tax.toFixed(2) %></span>
+      </div>
+      <div class="summary-row">
+        <span>Shipping:</span>
+        <span>$<%= order.shipping.toFixed(2) %></span>
+      </div>
+      <div class="summary-row total">
+        <span>Total:</span>
+        <span>$<%= order.finalAmount.toFixed(2) %></span>
+      </div>
+    </div>
+    <div class="order-actions">
+      <a href="/admin/orders" class="btn btn-secondary" aria-label="Back to Orders">
+        <i class="fas fa-arrow-left"></i> Back to Orders
+      </a>
+      <button class="btn btn-success" onclick="printOrder()">
+        <i class="fas fa-print"></i> Print Order
+      </button>
+    </div>
+  </section>
+</main>
+<script src="/js/main.js"></script>
+<script>
+function printOrder() {
+  window.print();
+}
+
+// Add status update confirmation
+document.querySelector('.order-status-form').addEventListener('submit', function(e) {
+  const currentStatus = '<%= order.status %>';
+  const newStatus = document.getElementById('status').value;
+  
+  if (currentStatus !== newStatus) {
+    if (!confirm(`Are you sure you want to update the order status from "${currentStatus}" to "${newStatus}"?`)) {
+      e.preventDefault();
+    }
+  }
+});
+</script>
+<style>
+.order-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.order-info-card, .customer-info-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.order-status-form {
+  margin-top: 1rem;
+}
+
+.input-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.input-group select {
+  flex: 1;
+}
+
+.order-items-section {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.order-summary {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.summary-row.total {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #4361EE;
+  border-bottom: none;
+}
+
+.order-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.status-badge {
+  padding: 0.3em 1em;
+  border-radius: 12px;
+  font-size: 0.9em;
+  font-weight: 600;
+}
+
+.status-badge.status-pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-badge.status-processing {
+  background: #cce5ff;
+  color: #004085;
+}
+
+.status-badge.status-shipped {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.status-badge.status-delivered {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-badge.status-cancelled {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+@media (max-width: 768px) {
+  .order-details-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .input-group {
+    flex-direction: column;
+  }
+  
+  .order-actions {
+    flex-direction: column;
+  }
+}
+</style>
+<!-- All admin styles are now in style.css --> 
