@@ -277,29 +277,5 @@ docker run -p 3000:3000 desertshop
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📝 License
-
-This project is licensed under the ISC License - see the [LICENSE](LICENSE) file for details.
-
-## 🆘 Support
-
-For support and questions:
-- Create an issue in the GitHub repository
-- Check the documentation in the `/docs` folder
-- Review the error logs in the `/logs` directory
-
-## 🔮 Roadmap
-
-- [ ] Mobile app development
-- [ ] Advanced analytics dashboard
-- [ ] Multi-language support
-- [ ] Advanced search with Elasticsearch
-- [ ] Real-time chat support
-- [ ] Loyalty program integration
-- [ ] Social media integration
-- [ ] Advanced inventory management
-- [ ] API for third-party integrations
-
----
 
 **DesertShop** - Bringing sweet moments to your doorstep! 🍰✨ 
