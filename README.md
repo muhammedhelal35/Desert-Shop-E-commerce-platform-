@@ -62,7 +62,7 @@ A full-featured e-commerce platform specializing in delicious desserts, pastries
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/desertshop.git
+   git clone https://github.com/muhammedhelal35/Desert-Shop-E-commerce-platform-.git
    cd desertshop
    ```
 
